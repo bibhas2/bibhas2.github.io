@@ -1,0 +1,95 @@
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<style>
+.dashboard {
+    font-family: "Helvetica Neue",Arial;
+    font-size: 1.5em;
+    width: 800px;
+}
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  text-align: center;
+}
+select {
+  font-size: 1.2rem;
+}
+.state-selection {
+  margin: 10px;
+}
+.header {
+  color: white;
+  background-color: black;
+  padding: 5px;
+  font-weight: bold;
+}
+.numbers {
+  font-size: 2.0em;
+  font-weight: bold;
+}
+.disclaimer {
+  font-size: 0.75em;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+
+  <div class="dashboard">
+    <h1>US COVID-19 Tracker</h1>
+
+    <div>
+      <div class="state-selection">
+        State: 
+        <select v-model="selectedState">
+          <option v-for="s in stateList" :value="s">{{s.state}}</option>
+        </select>
+      </div>
+
+      </div>
+
+      <div class="stats">
+        <div class="header">TOTAL TESTED</div>
+        <div class="header">TESTED POSITIVE</div>
+        <div class="header">HOSPITALIZED</div>
+        <div class="header">DEATHS</div>
+        <div class="numbers">{{formatter.format(selectedState.totalTestResults)}}</div>
+        <div class="numbers">{{formatter.format(selectedState.positive)}}</div>
+        <div class="numbers">{{formatter.format(selectedState.hospitalized)}}</div>
+        <div class="numbers">{{formatter.format(selectedState.death)}}</div>
+      </div>
+
+      <div class="disclaimer" v-if="selectedState.grade !== 'A'">
+        Quality of data from this state is not the best.
+      </div>
+  </div>
+
+  <script>
+      var helloApp = new Vue({
+          el: '.dashboard',
+          data: {
+              formatter: new Intl.NumberFormat,
+              selectedState: {},
+              stateList: []
+          },
+          mounted() {
+            fetch("https://covidtracking.com/api/states")
+              .then(response => response.json())
+              .then(data => {
+                this.stateList = data
+                this.selectedState = this.stateList[0]
+              })
+              .catch(err => alert("Sorry there was an error. Please try again."))
+          },
+          computed: {
+            dataQuality() {
+              if (this.selectedState.grade === 'A') return 'Very good'
+              else if (this.selectedState.grade === 'B') return 'Good'
+              else return 'Poor'
+            }
+          }
+        })
+  </script>
+</body>
+</html>
