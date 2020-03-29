@@ -5,8 +5,8 @@
 .dashboard {
     font-family: "Helvetica Neue",Arial;
     font-size: 1.5em;
-    width: 800px;
-    margin: 0 auto;
+    margin-left: 10px;
+    margin-right: 10px;
     margin-top: 25px;
 }
 .stats {
@@ -17,7 +17,7 @@
 select {
   font-size: 1.2rem;
 }
-.state-selection {
+.toolbar {
   margin: 10px;
 }
 .header {
@@ -42,10 +42,17 @@ select {
     <h1>US COVID-19 Tracker</h1>
 
     <div>
-      <div class="state-selection">
+      <div class="toolbar">
         State: 
         <select v-model="selectedState">
           <option v-for="s in stateList" :value="s">{{s.state}}</option>
+        </select>
+        Update every:
+        <select v-model="updateInterval" @change="startNewTimer">
+          <option :value="1">One minute</option>
+          <option :value="30">Half an hour</option>
+          <option :value="60">One hour</option>
+          <option :value="2400">Four hours</option>
         </select>
       </div>
 
@@ -71,18 +78,41 @@ select {
       var helloApp = new Vue({
           el: '.dashboard',
           data: {
+              updateInterval: 30,
               formatter: new Intl.NumberFormat,
               selectedState: {},
-              stateList: []
+              stateList: [],
+              timer: undefined
           },
-          mounted() {
-            fetch("https://covidtracking.com/api/states")
+          methods: {
+            updateDisplay() {
+              console.log("Updating display")
+              
+              return fetch("https://covidtracking.com/api/states")
               .then(response => response.json())
               .then(data => {
                 this.stateList = data
                 this.selectedState = this.stateList[0]
               })
+            },
+            startNewTimer() {
+              if (this.timer !== undefined) {
+                console.log("Stopping old timer")
+                clearInterval(this.timer)
+              }
+
+              console.log("Starting new timer", this.updateInterval * 60 * 1000)
+
+              this.timer = setInterval(
+                () => this.updateDisplay(), 
+                this.updateInterval * 60 * 1000)
+            }
+          },
+          mounted() {
+              this.updateDisplay()
               .catch(err => alert("Sorry there was an error. Please try again."))
+
+              this.startNewTimer()
           },
           computed: {
             dataQuality() {
