@@ -1,0 +1,124 @@
+<html>
+
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <style>
+    .dashboard {
+      font-family: "Helvetica Neue", Arial;
+      font-size: 1.5em;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 25px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr 1fr 1fr;
+    }
+
+    select {
+      font-size: 1.2rem;
+    }
+
+    .toolbar {
+      margin: 10px;
+    }
+
+    .header {
+      color: white;
+      background-color: black;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    .numbers {
+      font-size: 2.0em;
+      font-weight: bold;
+    }
+
+    .disclaimer {
+      font-size: 0.75em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard">
+    <h1>US COVID-19 Tracker</h1>
+
+    <div>
+      <div class="toolbar">
+        Update every:
+        <select v-model="updateInterval" @change="startNewTimer">
+          <option :value="1">One minutes</option>
+          <option :value="10">Ten minutes</option>
+          <option :value="30">Half an hour</option>
+          <option :value="60">One hour</option>
+          <option :value="2400">Four hours</option>
+        </select>
+      </div>
+
+      <div class="stats" v-if="stateList">
+        <div class="header">STATE</div>
+        <div class="header">TOTAL TESTED</div>
+        <div class="header">TESTED POSITIVE</div>
+        <div class="header">HOSPITALIZED</div>
+        <div class="header">DEATHS</div>
+        <template v-for="s in stateList">
+          <div class="numbers">{{s.state}}</div>
+          <div class="numbers">{{formatter.format(s.totalTestResults)}}</div>
+          <div class="numbers">{{formatter.format(s.positive)}}</div>
+          <div class="numbers">{{formatter.format(s.hospitalized)}}</div>
+          <div class="numbers">{{formatter.format(s.death)}}</div>
+        </template>
+      </div>
+
+    </div>
+
+    <script>
+      var helloApp = new Vue({
+        el: '.dashboard',
+        data: {
+          updateInterval: 30,
+          formatter: new Intl.NumberFormat,
+          stateList: [],
+          timer: undefined
+        },
+        methods: {
+          updateDisplay() {
+            console.log("Updating display")
+
+            return fetch("https://covidtracking.com/api/states")
+              .then(response => response.json())
+              .then(data => {
+                this.stateList = data
+              })
+          },
+          startNewTimer() {
+            if (this.timer !== undefined) {
+              console.log("Stopping old timer")
+              clearInterval(this.timer)
+            }
+
+            console.log("Starting new timer", this.updateInterval * 60 * 1000)
+
+            this.timer = setInterval(
+              () => this.updateDisplay(),
+              this.updateInterval * 60 * 1000)
+          }
+        },
+        mounted() {
+          this.updateDisplay()
+            .catch(err => alert("Sorry there was an error. Please try again."))
+
+          this.startNewTimer()
+        },
+        computed: {
+        }
+      })
+    </script>
+</body>
+
+</html>
