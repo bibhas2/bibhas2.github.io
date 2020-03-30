@@ -11,8 +11,8 @@
 }
 .stats {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  text-align: center;
+  grid-template-columns: 250px 1fr;
+  grid-gap: 5px 10px;
 }
 select {
   font-size: 1.2rem;
@@ -32,7 +32,7 @@ select {
 }
 .disclaimer {
   font-size: 0.75em;
-  text-align: right;
+  margin-top: 10px;
 }
 </style>
 </head>
@@ -59,12 +59,12 @@ select {
 
       <div class="stats" v-if="selectedState">
         <div class="header">TOTAL TESTED</div>
-        <div class="header">TESTED POSITIVE</div>
-        <div class="header">HOSPITALIZED</div>
-        <div class="header">DEATHS</div>
         <div class="numbers">{{formatter.format(selectedState.totalTestResults)}}</div>
+        <div class="header">TESTED POSITIVE</div>
         <div class="numbers">{{formatter.format(selectedState.positive)}}</div>
+        <div class="header">HOSPITALIZED</div>
         <div class="numbers">{{formatter.format(selectedState.hospitalized)}}</div>
+        <div class="header">DEATHS</div>
         <div class="numbers">{{formatter.format(selectedState.death)}}</div>
       </div>
 
