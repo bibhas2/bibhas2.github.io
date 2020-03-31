@@ -1,33 +1,34 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <style>
     .dashboard {
       font-family: "Helvetica Neue", Arial;
-      font-size: 1.5em;
-      margin-left: 10px;
-      margin-right: 10px;
+      /* font-size: 1.1em; */
+      margin-left: 5px;
+      margin-right: 5px;
       margin-top: 25px;
     }
     .stats {
       display: grid;
-      grid-template-columns: 120px 1fr 1fr 1fr 1fr;
+      grid-template-columns: 50px 1fr 1fr 1fr 1fr;
     }
     select {
-      font-size: 1.2rem;
+      font-size: 1.1em;
     }
     .toolbar {
-      margin: 10px;
+      margin-bottom: 10px;
     }
     .header {
       color: white;
       background-color: black;
       padding: 5px;
-      font-weight: bold;
+      /* font-weight: bold; */
     }
     .numbers {
-      font-size: 1.8em;
+      font-size: 1.4em;
       font-weight: bold;
     }
     .disclaimer {
@@ -40,7 +41,7 @@
 <body>
 
   <div class="dashboard">
-    <h1>US COVID-19 Tracker</h1>
+    <h1>COVID-19 Tracker</h1>
 
     <div>
       <div class="toolbar">
@@ -61,7 +62,7 @@
         <div class="header" @click="sort('state')">STATE</div>
         <div class="header" @click="sort('totalTestResults')">TOTAL TESTED</div>
         <div class="header" @click="sort('positive')">TESTED POSITIVE</div>
-        <div class="header" @click="sort('hospitalized')">HOSPITALIZED</div>
+        <div class="header" @click="sort('hospitalized')">HOSPITA-<br/>LIZED</div>
         <div class="header" @click="sort('death')">DEATHS</div>
         <template v-for="s in stateList" :key="s.state">
           <div class="numbers">{{s.state}}</div>
