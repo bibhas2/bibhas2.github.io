@@ -1,36 +1,43 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <style>
     .dashboard {
       font-family: "Helvetica Neue", Arial;
-      font-size: 1.5em;
+      font-size: 1.1em;
       margin-left: 10px;
       margin-right: 10px;
       margin-top: 25px;
     }
+
     .stats {
       display: grid;
-      grid-template-columns: 250px 1fr;
+      grid-template-columns: 180px 1fr;
       grid-gap: 5px 10px;
     }
+
     select {
-      font-size: 1.2rem;
+      font-size: 1.1em;
     }
+
     .toolbar {
-      margin: 10px;
+      margin-bottom: 10px;
     }
+
     .header {
       color: white;
       background-color: black;
       padding: 5px;
       font-weight: bold;
     }
+
     .numbers {
       font-size: 2.0em;
       font-weight: bold;
     }
+
     .disclaimer {
       font-size: 0.75em;
       margin-top: 10px;
@@ -41,22 +48,26 @@
 <body>
 
   <div class="dashboard">
-    <h1>US COVID-19 Tracker</h1>
+    <h1>COVID-19 Tracker</h1>
 
     <div>
       <div class="toolbar">
-        State:
-        <select v-model="selectedState">
-          <option v-for="s in stateList" :value="s">{{s.state}}</option>
-        </select>
-        Update every:
-        <select v-model="updateInterval" @change="startNewTimer">
-          <option :value="1">One minutes</option>
-          <option :value="10">Ten minutes</option>
-          <option :value="30">Half an hour</option>
-          <option :value="60">One hour</option>
-          <option :value="2400">Four hours</option>
-        </select>
+        <div>
+          State:
+          <select v-model="selectedState">
+            <option v-for="s in stateList" :value="s">{{s.state}}</option>
+          </select>
+        </div>
+        <div>
+          Update every:
+          <select v-model="updateInterval" @change="startNewTimer">
+            <option :value="1">One minutes</option>
+            <option :value="10">Ten minutes</option>
+            <option :value="30">Half an hour</option>
+            <option :value="60">One hour</option>
+            <option :value="2400">Four hours</option>
+          </select>
+        </div>
       </div>
 
       <div class="stats" v-if="selectedState">
