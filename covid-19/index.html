@@ -1,41 +1,43 @@
 <html>
+
 <head>
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<style>
-.dashboard {
-    font-family: "Helvetica Neue",Arial;
-    font-size: 1.5em;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 25px;
-}
-.stats {
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  grid-gap: 5px 10px;
-}
-select {
-  font-size: 1.2rem;
-}
-.toolbar {
-  margin: 10px;
-}
-.header {
-  color: white;
-  background-color: black;
-  padding: 5px;
-  font-weight: bold;
-}
-.numbers {
-  font-size: 2.0em;
-  font-weight: bold;
-}
-.disclaimer {
-  font-size: 0.75em;
-  margin-top: 10px;
-}
-</style>
+  <style>
+    .dashboard {
+      font-family: "Helvetica Neue", Arial;
+      font-size: 1.5em;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 25px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      grid-gap: 5px 10px;
+    }
+    select {
+      font-size: 1.2rem;
+    }
+    .toolbar {
+      margin: 10px;
+    }
+    .header {
+      color: white;
+      background-color: black;
+      padding: 5px;
+      font-weight: bold;
+    }
+    .numbers {
+      font-size: 2.0em;
+      font-weight: bold;
+    }
+    .disclaimer {
+      font-size: 0.75em;
+      margin-top: 10px;
+    }
+  </style>
 </head>
+
 <body>
 
   <div class="dashboard">
@@ -43,7 +45,7 @@ select {
 
     <div>
       <div class="toolbar">
-        State: 
+        State:
         <select v-model="selectedState">
           <option v-for="s in stateList" :value="s">{{s.state}}</option>
         </select>
@@ -72,62 +74,64 @@ select {
         Data is from: {{selectedState.lastUpdateEt}} ET.
         <span v-if="selectedState.grade !== 'A'">Quality of data from this state is not the best.</span>
       </div>
+    </div>
   </div>
 
   <script>
-      var helloApp = new Vue({
-          el: '.dashboard',
-          data: {
-              updateInterval: 30,
-              formatter: new Intl.NumberFormat,
-              selectedState: undefined,
-              stateList: [],
-              timer: undefined
-          },
-          methods: {
-            updateDisplay() {
-              console.log("Updating display")
-              
-              return fetch("https://covidtracking.com/api/states")
-              .then(response => response.json())
-              .then(data => {
-                this.stateList = data
+    var helloApp = new Vue({
+      el: '.dashboard',
+      data: {
+        updateInterval: 30,
+        formatter: new Intl.NumberFormat,
+        selectedState: undefined,
+        stateList: [],
+        timer: undefined
+      },
+      methods: {
+        updateDisplay() {
+          console.log("Updating display")
 
-                if (this.selectedState === undefined) {
-                  this.selectedState = this.stateList[0]
-                } else {
-                  //Choose the last selected state
-                  this.selectedState = this.stateList.find(s => s.state === this.selectedState.state)
-                }
-              })
-            },
-            startNewTimer() {
-              if (this.timer !== undefined) {
-                console.log("Stopping old timer")
-                clearInterval(this.timer)
+          return fetch("https://covidtracking.com/api/states")
+            .then(response => response.json())
+            .then(data => {
+              this.stateList = data
+
+              if (this.selectedState === undefined) {
+                this.selectedState = this.stateList[0]
+              } else {
+                //Choose the last selected state
+                this.selectedState = this.stateList.find(s => s.state === this.selectedState.state)
               }
-
-              console.log("Starting new timer", this.updateInterval * 60 * 1000)
-
-              this.timer = setInterval(
-                () => this.updateDisplay(), 
-                this.updateInterval * 60 * 1000)
-            }
-          },
-          mounted() {
-              this.updateDisplay()
-              .catch(err => alert("Sorry there was an error. Please try again."))
-
-              this.startNewTimer()
-          },
-          computed: {
-            dataQuality() {
-              if (this.selectedState.grade === 'A') return 'Very good'
-              else if (this.selectedState.grade === 'B') return 'Good'
-              else return 'Poor'
-            }
+            })
+        },
+        startNewTimer() {
+          if (this.timer !== undefined) {
+            console.log("Stopping old timer")
+            clearInterval(this.timer)
           }
-        })
+
+          console.log("Starting new timer", this.updateInterval * 60 * 1000)
+
+          this.timer = setInterval(
+            () => this.updateDisplay(),
+            this.updateInterval * 60 * 1000)
+        }
+      },
+      mounted() {
+        this.updateDisplay()
+          .catch(err => alert("Sorry there was an error. Please try again."))
+
+        this.startNewTimer()
+      },
+      computed: {
+        dataQuality() {
+          if (this.selectedState.grade === 'A') return 'Very good'
+          else if (this.selectedState.grade === 'B') return 'Good'
+          else return 'Poor'
+        }
+      }
+    })
   </script>
 </body>
+
 </html>

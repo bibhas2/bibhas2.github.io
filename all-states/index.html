@@ -10,32 +10,26 @@
       margin-right: 10px;
       margin-top: 25px;
     }
-
     .stats {
       display: grid;
       grid-template-columns: 120px 1fr 1fr 1fr 1fr;
     }
-
     select {
       font-size: 1.2rem;
     }
-
     .toolbar {
       margin: 10px;
     }
-
     .header {
       color: white;
       background-color: black;
       padding: 5px;
       font-weight: bold;
     }
-
     .numbers {
       font-size: 1.8em;
       font-weight: bold;
     }
-
     .disclaimer {
       font-size: 0.75em;
       margin-top: 10px;
@@ -60,16 +54,16 @@
         <div>
           Tap on a header to sort by that column.
         </div>
-        </div>
+      </div>
 
-      
+
       <div class="stats" v-if="stateList">
         <div class="header" @click="sort('state')">STATE</div>
         <div class="header" @click="sort('totalTestResults')">TOTAL TESTED</div>
         <div class="header" @click="sort('positive')">TESTED POSITIVE</div>
         <div class="header" @click="sort('hospitalized')">HOSPITALIZED</div>
         <div class="header" @click="sort('death')">DEATHS</div>
-        <template v-for="s in stateList">
+        <template v-for="s in stateList" :key="s.state">
           <div class="numbers">{{s.state}}</div>
           <div class="numbers">{{formatter.format(s.totalTestResults)}}</div>
           <div class="numbers">{{formatter.format(s.positive)}}</div>
@@ -79,66 +73,67 @@
       </div>
 
     </div>
+  </div>
 
-    <script>
-      var helloApp = new Vue({
-        el: '.dashboard',
-        data: {
-          updateInterval: 30,
-          formatter: new Intl.NumberFormat,
-          stateList: [],
-          timer: undefined,
-          descendingSort: true
-        },
-        methods: {
-          updateDisplay() {
-            console.log("Updating display")
+  <script>
+    var helloApp = new Vue({
+      el: '.dashboard',
+      data: {
+        updateInterval: 30,
+        formatter: new Intl.NumberFormat,
+        stateList: [],
+        timer: undefined,
+        descendingSort: true
+      },
+      methods: {
+        updateDisplay() {
+          console.log("Updating display")
 
-            return fetch("https://covidtracking.com/api/states")
-              .then(response => response.json())
-              .then(data => {
-                this.stateList = data
-              })
-          },
-          startNewTimer() {
-            if (this.timer !== undefined) {
-              console.log("Stopping old timer")
-              clearInterval(this.timer)
-            }
-
-            console.log("Starting new timer", this.updateInterval * 60 * 1000)
-
-            this.timer = setInterval(
-              () => this.updateDisplay(),
-              this.updateInterval * 60 * 1000)
-          },
-          sort(byProp) {
-            this.stateList = this.stateList.sort((s1, s2) => {
-              let a = s1[byProp]
-              let b = s2[byProp]
-
-              if (a < b) {
-                return this.descendingSort ? 1 : -1
-              } else if (a > b) {
-                return this.descendingSort ? -1 : 1
-              } else {
-                return 0
-              }
+          return fetch("https://covidtracking.com/api/states")
+            .then(response => response.json())
+            .then(data => {
+              this.stateList = data
             })
-
-            this.descendingSort = !this.descendingSort
+        },
+        startNewTimer() {
+          if (this.timer !== undefined) {
+            console.log("Stopping old timer")
+            clearInterval(this.timer)
           }
-        },
-        mounted() {
-          this.updateDisplay()
-            .catch(err => alert("Sorry there was an error. Please try again."))
 
-          this.startNewTimer()
+          console.log("Starting new timer", this.updateInterval * 60 * 1000)
+
+          this.timer = setInterval(
+            () => this.updateDisplay(),
+            this.updateInterval * 60 * 1000)
         },
-        computed: {
+        sort(byProp) {
+          this.stateList = this.stateList.sort((s1, s2) => {
+            let a = s1[byProp]
+            let b = s2[byProp]
+
+            if (a < b) {
+              return this.descendingSort ? 1 : -1
+            } else if (a > b) {
+              return this.descendingSort ? -1 : 1
+            } else {
+              return 0
+            }
+          })
+
+          this.descendingSort = !this.descendingSort
         }
-      })
-    </script>
+      },
+      mounted() {
+        this.updateDisplay()
+          .catch(err => alert("Sorry there was an error. Please try again."))
+
+        this.startNewTimer()
+      },
+      computed: {
+      }
+    })
+  </script>
 </body>
 
 </html>
