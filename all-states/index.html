@@ -11,26 +11,39 @@
       margin-right: 5px;
       margin-top: 25px;
     }
-    .stats {
+
+    .stats-header {
       display: grid;
       grid-template-columns: 50px 1fr 1fr 1fr 1fr;
     }
+    .stats-numbers {
+      display: grid;
+      grid-template-columns: 50px 1fr 1fr 1fr 1fr;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
     select {
       font-size: 1.1em;
     }
+
     .toolbar {
       margin-bottom: 10px;
     }
+
     .header {
       color: white;
       background-color: black;
       padding: 5px;
       /* font-weight: bold; */
     }
+
     .numbers {
       font-size: 1.4em;
       font-weight: bold;
+      border-bottom: thin gray solid;
     }
+
     .disclaimer {
       font-size: 0.75em;
       margin-top: 10px;
@@ -59,18 +72,22 @@
 
 
       <div class="stats" v-if="stateList">
-        <div class="header" @click="sort('state')">STATE</div>
-        <div class="header" @click="sort('totalTestResults')">TOTAL TESTED</div>
-        <div class="header" @click="sort('positive')">TESTED POSITIVE</div>
-        <div class="header" @click="sort('hospitalized')">HOSPITA-<br/>LIZED</div>
-        <div class="header" @click="sort('death')">DEATHS</div>
-        <template v-for="s in stateList" :key="s.state">
-          <div class="numbers">{{s.state}}</div>
-          <div class="numbers">{{formatter.format(s.totalTestResults)}}</div>
-          <div class="numbers">{{formatter.format(s.positive)}}</div>
-          <div class="numbers">{{formatter.format(s.hospitalized)}}</div>
-          <div class="numbers">{{formatter.format(s.death)}}</div>
-        </template>
+        <div class="stats-header">
+          <div class="header" @click="sort('state')">STATE</div>
+          <div class="header" @click="sort('totalTestResults')">TOTAL TESTED</div>
+          <div class="header" @click="sort('positive')">TESTED POSITIVE</div>
+          <div class="header" @click="sort('hospitalized')">HOSPITA-<br />LIZED</div>
+          <div class="header" @click="sort('death')">DEATHS</div>
+        </div>
+        <div class="stats-numbers">
+          <template v-for="s in stateList" :key="s.state">
+            <div class="numbers">{{s.state}}</div>
+            <div class="numbers">{{formatter.format(s.totalTestResults)}}</div>
+            <div class="numbers">{{formatter.format(s.positive)}}</div>
+            <div class="numbers">{{formatter.format(s.hospitalized)}}</div>
+            <div class="numbers">{{formatter.format(s.death)}}</div>
+          </template>
+        </div>
       </div>
 
     </div>
