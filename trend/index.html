@@ -12,10 +12,10 @@
       margin-right: 10px;
       margin-top: 25px;
     }
+
     select {
       font-size: 1.1em;
     }
-
   </style>
 </head>
 
@@ -28,9 +28,9 @@
         <select v-model="selectedState" @change="processData">
           <option v-for="s in stateList" :value="s">{{s}}</option>
         </select>
-        <br/>
+        <br />
         <label v-for="prop in propertyList">
-          <input type="radio" v-model="selectedProperty" :value="prop" @change="processData"/> {{prop.label}}
+          <input type="radio" v-model="selectedProperty" :value="prop" @change="processData" /> {{prop.label}}
         </label>
       </div>
     </div>
@@ -47,6 +47,7 @@
         historyData: [],
         movingAverageDays: 7,
         selectedProperty: undefined,
+        chart: undefined,
         propertyList: [
           {
             name: "positiveIncrease",
@@ -78,7 +79,7 @@
           let stateDict = new Map()
 
           this.historyData.forEach(rec => stateDict.set(rec.state, rec.state))
-          stateDict.forEach(value => {this.stateList.push(value)})
+          stateDict.forEach(value => { this.stateList.push(value) })
           this.stateList.sort()
         },
         processData() {
@@ -90,9 +91,9 @@
               else return 0
             })
 
-          let labelList =[]
+          let labelList = []
           let maList = []
-          
+
           this.computeMovingAvg(stateData, labelList, maList, this.selectedProperty.name)
 
           // maList.forEach(avg => console.log(avg))
@@ -112,27 +113,30 @@
           }
         },
         renderGraph(labelList, maList, prop) {
-          let ctx = document.getElementById('chart').getContext('2d')
-          new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: labelList,
-              datasets: [
-                {
-                  data: maList,
-                  label: prop.label,
-                  borderColor: prop.color,
-                  fill: false
-                }
-              ]
-            },
-            options: {}
-          });
+          this.chart.data.labels = labelList
+          this.chart.data.datasets[0] = {
+            data: maList,
+            label: prop.label,
+            borderColor: prop.color,
+            fill: false
+          }
+          this.chart.update()
         }
       },
       mounted() {
+        let ctx = document.getElementById('chart').getContext('2d')
+
+        this.chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: []
+          },
+          options: {}
+        })
+
         this.updateDisplay()
-          .catch(err => {console.log(err); alert("Sorry there was an error. Please try again.")})
+          .catch(err => { console.log(err); alert("Sorry there was an error. Please try again.") })
       },
       computed: {
       }
