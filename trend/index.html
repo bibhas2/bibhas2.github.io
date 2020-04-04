@@ -28,6 +28,11 @@
         <select v-model="selectedState" @change="processData">
           <option v-for="s in stateList" :value="s">{{s}}</option>
         </select>
+        Source:
+        <select v-model="selectedDataSource" @change="updateDisplay">
+          <option v-for="d in dataSourceList" :value="d">{{d.label}}</option>
+        </select>
+
         <br />
         <label v-for="prop in propertyList">
           <input type="radio" v-model="selectedProperty" :value="prop" @change="processData" /> {{prop.label}}
@@ -42,7 +47,7 @@
     var helloApp = new Vue({
       el: '.dashboard',
       data: {
-        selectedState: "NY",
+        selectedState: "",
         stateList: [],
         historyData: [],
         movingAverageDays: 7,
@@ -59,24 +64,76 @@
             label: "New Deaths",
             color: "#8e5ea2"
           }
-        ]
+        ],
+        dataSourceList: [
+          {
+            label: "New York Times",
+            fetchData() {
+              return fetch("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
+                .then(response => response.text())
+                .then(text => {
+                  let lines = text.split("\n")
+                  
+                  lines.shift() //Get rid of header
+
+                  let lastPositiveMap = new Map()
+                  let lastDeathMap = new Map()
+
+                  let data = lines.map(line => {
+                    let [dayStr, state, fips, cases, deaths] = line.split(",")
+
+                    let lastPositive = lastPositiveMap.get(state) ? lastPositiveMap.get(state) : 0
+                    let lastDeath = lastDeathMap.get(state) ? lastDeathMap.get(state) : 0
+
+                    let date = Date.parse(dayStr)
+                    let positiveIncrease = cases - lastPositive
+                    let deathIncrease = deaths - lastDeath
+
+                    // if (state === "Florida") {
+                    //   console.log(dayStr, cases, deaths, positiveIncrease, deathIncrease)
+                    // }
+
+                    lastPositiveMap.set(state, cases)
+                    lastDeathMap.set(state, deaths)
+
+                    return {
+                      date,
+                      state,
+                      positiveIncrease,
+                      deathIncrease
+                    }
+                  })
+
+                  return data
+                })
+            }
+          },
+          {
+            label: "CovidTracking.com",
+            fetchData() {
+              return fetch("https://covidtracking.com/api/states/daily")
+                .then(response => response.json())
+            }
+          }
+        ],
+        selectedDataSource: undefined
       },
       methods: {
         updateDisplay() {
           console.log("Updating display")
-
-          this.selectedProperty = this.propertyList[0]
-
-          return fetch("https://covidtracking.com/api/states/daily")
-            .then(response => response.json())
+          return this.selectedDataSource.fetchData()
             .then(data => {
               this.historyData = data
-              this.processData()
               this.buildStateNameList()
+              this.selectedState = this.stateList[0]
+
+              this.processData()
             })
         },
         buildStateNameList() {
           let stateDict = new Map()
+
+          this.stateList.length = 0 //Clear
 
           this.historyData.forEach(rec => stateDict.set(rec.state, rec.state))
           stateDict.forEach(value => { this.stateList.push(value) })
@@ -134,6 +191,9 @@
           },
           options: {}
         })
+
+        this.selectedProperty = this.propertyList[0]
+        this.selectedDataSource = this.dataSourceList[0]
 
         this.updateDisplay()
           .catch(err => { console.log(err); alert("Sorry there was an error. Please try again.") })
