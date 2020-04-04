@@ -1,0 +1,129 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <style>
+    .dashboard {
+
+    }
+    #chart {
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard">
+    <h1>COVID-19 Tracker</h1>
+    <div class="toolbar">
+      <div>
+        State:
+        <select v-model="selectedState" @change="processData">
+          <option v-for="s in stateList" :value="s">{{s}}</option>
+        </select>
+      </div>
+    </div>
+
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script>
+    var helloApp = new Vue({
+      el: '.dashboard',
+      data: {
+        selectedState: "NY",
+        stateList: [],
+        historyData: [],
+        movingAverageDays: 7,
+
+      },
+      methods: {
+        updateDisplay() {
+          console.log("Updating display")
+
+          return fetch("daily.json")
+            .then(response => response.json())
+            .then(data => {
+              this.historyData = data
+              this.processData()
+            })
+        },
+        processData() {
+          let stateData = this.historyData
+            .filter(record => record.state === this.selectedState)
+            .sort((r1, r2) => {
+              if (r1.date < r2.date) return -1
+              else if (r1.date > r2.date) return 1
+              else return 0
+            })
+
+          let stateDict = new Map()
+
+          this.historyData.forEach(rec => stateDict.set(rec.state, rec.state))
+          stateDict.forEach(value => {this.stateList.push(value)})
+          this.stateList.sort()
+          
+          // stateData.forEach(r => console.log(r.date, r.positiveIncrease))
+
+          let labelList =[]
+          let positiveList = []
+          let deathList = []
+          
+          this.computeMovingAvg(stateData, labelList, positiveList, "positiveIncrease")
+          this.computeMovingAvg(stateData, [], deathList, "deathIncrease")
+
+          // maList.forEach(avg => console.log(avg))
+          this.renderGraph(labelList, positiveList, deathList)
+        },
+        computeMovingAvg(stateData, labelList, maList, propertyName) {
+          for (i = 0; i < stateData.length - this.movingAverageDays; ++i) {
+            let sum = 0
+
+            for (j = i; j < i + this.movingAverageDays; ++j) {
+              let incr = stateData[j][propertyName] !== null ? stateData[j][propertyName] : 0
+
+              sum += incr
+            }
+            labelList.push(i)
+            maList.push(sum / this.movingAverageDays)
+          }
+        },
+        renderGraph(labelList, positiveList, deathList) {
+          let ctx = document.getElementById('chart').getContext('2d')
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labelList,
+              datasets: [
+                {
+                  data: positiveList,
+                  label: "Positive increase",
+                  borderColor: "#3e95cd",
+                  fill: false
+                },
+                {
+                  data: deathList,
+                  label: "Death increase",
+                  borderColor: "#8e5ea2",
+                  fill: false
+                }
+              ]
+            },
+            options: {}
+          });
+        }
+      },
+      mounted() {
+        this.updateDisplay()
+          .catch(err => alert("Sorry there was an error. Please try again."))
+      },
+      computed: {
+      }
+    })
+  </script>
+</body>
+
+</html>
