@@ -15,6 +15,7 @@
 
     select {
       font-size: 1.1em;
+      max-width: 175px;
     }
 
     .modal-dialog-backdrop {
@@ -97,8 +98,8 @@
   <script>
     Vue.component("modal-dialog", {
       template: `
-      <div class="modal-dialog-backdrop" :style="{display: isShown ? 'block' : 'none'}">
-        <div class="modal-dialog-content" :style="{maxWidth: maxWidth}">
+      <div class="modal-dialog-backdrop" @click="close" :style="{display: isShown ? 'block' : 'none'}">
+        <div class="modal-dialog-content" @click.stop="eatClick" :style="{maxWidth: maxWidth}">
           <div class="modal-dialog-toolbar" @click="close">&times;</div>
           <slot></slot>
         </div>
@@ -120,6 +121,9 @@
         },
         close() {
           this.isShown = false
+        },
+        eatClick() {
+
         }
       }
     })
