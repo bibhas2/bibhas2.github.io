@@ -65,10 +65,11 @@
         <select v-model="selectedState" @change="processData">
           <option v-for="s in stateList" :value="s">{{s}}</option>
         </select>
-        <img src="settings.svg" width="35px" style="vertical-align: middle; margin-left: 10px;" @click="$refs.settingsDialog.open()" />
+        <img src="settings.svg" width="35px" style="vertical-align: middle; margin-left: 10px;"
+          @click="$refs.settingsDialog.open()" />
       </div>
       <div>
-        <label v-for="prop in propertyList">
+        <label v-for="prop in applicablePropertyList">
           <input type="radio" v-model="selectedProperty" :value="prop" @change="processData" /> {{prop.label}}
         </label>
       </div>
@@ -84,6 +85,7 @@
         <div>
           Show
           <select v-model="movingAverageDays" @change="processData">
+            <option :value="3">3 days</option>
             <option :value="7">7 days</option>
             <option :value="10">10 days</option>
             <option :value="14">14 days</option>
@@ -139,6 +141,11 @@
         chart: undefined,
         propertyList: [
           {
+            name: "hospitalizedIncrease",
+            label: "New Hospitalized",
+            color: "#8e5ea2"
+          },
+          {
             name: "positiveIncrease",
             label: "New Positive Cases",
             color: "#3e95cd"
@@ -146,11 +153,12 @@
           {
             name: "deathIncrease",
             label: "New Deaths",
-            color: "#8e5ea2"
+            color: "#cfcfcf"
           }
         ],
         dataSourceList: [
           {
+            id: "NYT",
             label: "New York Times",
             fetchData() {
               return fetch("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv")
@@ -193,6 +201,7 @@
             }
           },
           {
+            id: "CTC",
             label: "CovidTracking.com",
             fetchData() {
               return fetch("https://covidtracking.com/api/states/daily")
@@ -210,7 +219,8 @@
               this.historyData = data
               this.buildStateNameList()
               this.selectedState = this.stateList[0]
-
+              this.selectedProperty = this.applicablePropertyList[0]
+              
               this.processData()
             })
         },
@@ -276,13 +286,22 @@
           options: {}
         })
 
-        this.selectedProperty = this.propertyList[0]
-        this.selectedDataSource = this.dataSourceList[0]
+        this.selectedDataSource = this.dataSourceList.find(ds => ds.id === "CTC")
+        this.selectedProperty = this.applicablePropertyList[0]
 
         this.updateDisplay()
           .catch(err => { console.log(err); alert("Sorry there was an error. Please try again.") })
       },
       computed: {
+        applicablePropertyList() {
+          if (this.selectedDataSource === undefined) {
+            return undefined
+          } else if (this.selectedDataSource.id === "NYT") {
+            return this.propertyList.filter(p => p.name != "hospitalizedIncrease")
+          } else {
+            return this.propertyList
+          }
+        }
       }
     })
   </script>
