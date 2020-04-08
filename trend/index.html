@@ -69,6 +69,7 @@
           @click="$refs.settingsDialog.open()" />
       </div>
       <div>
+        {{movingAverageDays}} Days Avg. New
         <label v-for="prop in applicablePropertyList">
           <input type="radio" v-model="selectedProperty" :value="prop" @change="processData" /> {{prop.label}}
         </label>
@@ -136,23 +137,23 @@
         selectedState: "",
         stateList: [],
         historyData: [],
-        movingAverageDays: 7,
+        movingAverageDays: 3,
         selectedProperty: undefined,
         chart: undefined,
         propertyList: [
           {
             name: "hospitalizedIncrease",
-            label: "New Hospitalized",
+            label: "Hospitalized",
             color: "#8e5ea2"
           },
           {
             name: "positiveIncrease",
-            label: "New Positive Cases",
+            label: "Positive Cases",
             color: "#3e95cd"
           },
           {
             name: "deathIncrease",
-            label: "New Deaths",
+            label: "Deaths",
             color: "#cfcfcf"
           }
         ],
@@ -220,7 +221,7 @@
               this.buildStateNameList()
               this.selectedState = this.stateList[0]
               this.selectedProperty = this.applicablePropertyList[0]
-              
+
               this.processData()
             })
         },
