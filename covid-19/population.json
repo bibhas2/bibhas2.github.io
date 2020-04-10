@@ -1,0 +1,366 @@
+[
+  {
+    "state": "AL",
+    "state_name": "Alabama",
+    "geo_id": "01",
+    "population": 4887871,
+    "pop_density": 96.50938865
+  },
+  {
+    "state": "AK",
+    "state_name": "Alaska",
+    "geo_id": "02",
+    "population": 737438,
+    "pop_density": 1.2915230609
+  },
+  {
+    "state": "AZ",
+    "state_name": "Arizona",
+    "geo_id": "04",
+    "population": 7171646,
+    "pop_density": 63.135855048
+  },
+  {
+    "state": "AR",
+    "state_name": "Arkansas",
+    "geo_id": "05",
+    "population": 3013825,
+    "pop_density": 57.919684465
+  },
+  {
+    "state": "CA",
+    "state_name": "California",
+    "geo_id": "06",
+    "population": 39557045,
+    "pop_density": 253.9065023
+  },
+  {
+    "state": "CO",
+    "state_name": "Colorado",
+    "geo_id": "08",
+    "population": 5695564,
+    "pop_density": 54.955977559
+  },
+  {
+    "state": "CT",
+    "state_name": "Connecticut",
+    "geo_id": "09",
+    "population": 3572665,
+    "pop_density": 737.74459965
+  },
+  {
+    "state": "DE",
+    "state_name": "Delaware",
+    "geo_id": 10,
+    "population": 967171,
+    "pop_density": 496.4324605
+  },
+  {
+    "state": "DC",
+    "state_name": "District of Columbia",
+    "geo_id": 11,
+    "population": 702455,
+    "pop_density": 11490.11954
+  },
+  {
+    "state": "FL",
+    "state_name": "Florida",
+    "geo_id": 12,
+    "population": 21299325,
+    "pop_density": 397.01575445
+  },
+  {
+    "state": "GA",
+    "state_name": "Georgia",
+    "geo_id": 13,
+    "population": 10519475,
+    "pop_density": 182.26478911
+  },
+  {
+    "state": "HI",
+    "state_name": "Hawaii",
+    "geo_id": 15,
+    "population": 1420491,
+    "pop_density": 221.17691552
+  },
+  {
+    "state": "ID",
+    "state_name": "Idaho",
+    "geo_id": 16,
+    "population": 1754208,
+    "pop_density": 21.225798536
+  },
+  {
+    "state": "IL",
+    "state_name": "Illinois",
+    "geo_id": 17,
+    "population": 12741080,
+    "pop_density": 229.51115613
+  },
+  {
+    "state": "IN",
+    "state_name": "Indiana",
+    "geo_id": 18,
+    "population": 6691878,
+    "pop_density": 186.78751987
+  },
+  {
+    "state": "IA",
+    "state_name": "Iowa",
+    "geo_id": 19,
+    "population": 3156145,
+    "pop_density": 56.507023549
+  },
+  {
+    "state": "KS",
+    "state_name": "Kansas",
+    "geo_id": 20,
+    "population": 2911505,
+    "pop_density": 35.610732968
+  },
+  {
+    "state": "KY",
+    "state_name": "Kentucky",
+    "geo_id": 21,
+    "population": 4468402,
+    "pop_density": 113.15179107
+  },
+  {
+    "state": "LA",
+    "state_name": "Louisiana",
+    "geo_id": 22,
+    "population": 4659978,
+    "pop_density": 107.86011234
+  },
+  {
+    "state": "ME",
+    "state_name": "Maine",
+    "geo_id": 23,
+    "population": 1338404,
+    "pop_density": 43.391688419
+  },
+  {
+    "state": "MD",
+    "state_name": "Maryland",
+    "geo_id": 24,
+    "population": 6042718,
+    "pop_density": 622.26172745
+  },
+  {
+    "state": "MA",
+    "state_name": "Massachusetts",
+    "geo_id": 25,
+    "population": 6902149,
+    "pop_density": 884.74992172
+  },
+  {
+    "state": "MI",
+    "state_name": "Michigan",
+    "geo_id": 26,
+    "population": 9995915,
+    "pop_density": 176.59707779
+  },
+  {
+    "state": "MN",
+    "state_name": "Minnesota",
+    "geo_id": 27,
+    "population": 5611179,
+    "pop_density": 70.469674696
+  },
+  {
+    "state": "MS",
+    "state_name": "Mississippi",
+    "geo_id": 28,
+    "population": 2986530,
+    "pop_density": 63.645625459
+  },
+  {
+    "state": "MO",
+    "state_name": "Missouri",
+    "geo_id": 29,
+    "population": 6126452,
+    "pop_density": 89.117470789
+  },
+  {
+    "state": "MT",
+    "state_name": "Montana",
+    "geo_id": 30,
+    "population": 1062305,
+    "pop_density": 7.298751095
+  },
+  {
+    "state": "NE",
+    "state_name": "Nebraska",
+    "geo_id": 31,
+    "population": 1929268,
+    "pop_density": 25.114922059
+  },
+  {
+    "state": "NV",
+    "state_name": "Nevada",
+    "geo_id": 32,
+    "population": 3034392,
+    "pop_density": 27.6406025
+  },
+  {
+    "state": "NH",
+    "state_name": "New Hampshire",
+    "geo_id": 33,
+    "population": 1356458,
+    "pop_density": 151.50059716
+  },
+  {
+    "state": "NJ",
+    "state_name": "New Jersey",
+    "geo_id": 34,
+    "population": 8908520,
+    "pop_density": 1211.3172349
+  },
+  {
+    "state": "NM",
+    "state_name": "New Mexico",
+    "geo_id": 35,
+    "population": 2095428,
+    "pop_density": 17.273065483
+  },
+  {
+    "state": "NY",
+    "state_name": "New York",
+    "geo_id": 36,
+    "population": 19542209,
+    "pop_density": 414.70249405
+  },
+  {
+    "state": "NC",
+    "state_name": "North Carolina",
+    "geo_id": 37,
+    "population": 10383620,
+    "pop_density": 213.56949153
+  },
+  {
+    "state": "ND",
+    "state_name": "North Dakota",
+    "geo_id": 38,
+    "population": 760077,
+    "pop_density": 11.015709613
+  },
+  {
+    "state": "OH",
+    "state_name": "Ohio",
+    "geo_id": 39,
+    "population": 11689442,
+    "pop_density": 286.07988455
+  },
+  {
+    "state": "OK",
+    "state_name": "Oklahoma",
+    "geo_id": 40,
+    "population": 3943079,
+    "pop_density": 57.482602245
+  },
+  {
+    "state": "OR",
+    "state_name": "Oregon",
+    "geo_id": 41,
+    "population": 4190713,
+    "pop_density": 43.658853835
+  },
+  {
+    "state": "PA",
+    "state_name": "Pennsylvania",
+    "geo_id": 42,
+    "population": 12807060,
+    "pop_density": 286.23455445
+  },
+  {
+    "state": "RI",
+    "state_name": "Rhode Island",
+    "geo_id": 44,
+    "population": 1057315,
+    "pop_density": 1022.6505771
+  },
+  {
+    "state": "SC",
+    "state_name": "South Carolina",
+    "geo_id": 45,
+    "population": 5084127,
+    "pop_density": 169.11117582
+  },
+  {
+    "state": "SD",
+    "state_name": "South Dakota",
+    "geo_id": 46,
+    "population": 882235,
+    "pop_density": 11.637449389
+  },
+  {
+    "state": "TN",
+    "state_name": "Tennessee",
+    "geo_id": 47,
+    "population": 6770010,
+    "pop_density": 164.17412699
+  },
+  {
+    "state": "TX",
+    "state_name": "Texas",
+    "geo_id": 48,
+    "population": 28701845,
+    "pop_density": 109.86046804
+  },
+  {
+    "state": "UT",
+    "state_name": "Utah",
+    "geo_id": 49,
+    "population": 3161105,
+    "pop_density": 38.458214685
+  },
+  {
+    "state": "VT",
+    "state_name": "Vermont",
+    "geo_id": 50,
+    "population": 626299,
+    "pop_density": 67.943995144
+  },
+  {
+    "state": "VA",
+    "state_name": "Virginia",
+    "geo_id": 51,
+    "population": 8517685,
+    "pop_density": 215.73630393
+  },
+  {
+    "state": "WA",
+    "state_name": "Washington",
+    "geo_id": 53,
+    "population": 7535591,
+    "pop_density": 113.39722716
+  },
+  {
+    "state": "WV",
+    "state_name": "West Virginia",
+    "geo_id": 54,
+    "population": 1805832,
+    "pop_density": 75.11398785
+  },
+  {
+    "state": "WI",
+    "state_name": "Wisconsin",
+    "geo_id": 55,
+    "population": 5813568,
+    "pop_density": 107.32815663
+  },
+  {
+    "state": "WY",
+    "state_name": "Wyoming",
+    "geo_id": 56,
+    "population": 577737,
+    "pop_density": 5.9506106574
+  },
+  {
+    "state": "PR",
+    "state_name": "Puerto Rico",
+    "geo_id": 72,
+    "population": 3195153,
+    "pop_density": "NA"
+  }
+]
