@@ -1,0 +1,148 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <style>
+    .dashboard {
+      font-family: "Helvetica Neue", Arial;
+      font-size: 1.1em;
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 25px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      grid-gap: 5px 10px;
+    }
+
+    select {
+      font-size: 1.1em;
+    }
+
+    .toolbar {
+      margin-bottom: 10px;
+    }
+
+    .header {
+      color: white;
+      background-color: black;
+      padding: 5px;
+      font-weight: bold;
+    }
+
+    .numbers {
+      font-size: 2.0em;
+      font-weight: bold;
+    }
+
+    .disclaimer {
+      font-size: 0.75em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard">
+    <h1>COVID-19 Tracker</h1>
+
+    <div>
+      <div class="toolbar">
+        <div>
+          State:
+          <select v-model="selectedState">
+            <option v-for="s in stateList" :value="s">{{s.state}}</option>
+          </select>
+        </div>
+        <div>
+          Update every:
+          <select v-model="updateInterval" @change="startNewTimer">
+            <option :value="1">One minutes</option>
+            <option :value="10">Ten minutes</option>
+            <option :value="30">Half an hour</option>
+            <option :value="60">One hour</option>
+            <option :value="2400">Four hours</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stats" v-if="selectedState">
+        <div class="header">TOTAL TESTED</div>
+        <div class="numbers">{{formatter.format(selectedState.totalTestResults)}}</div>
+        <div class="header">TESTED POSITIVE</div>
+        <div class="numbers">{{formatter.format(selectedState.positive)}}</div>
+        <div class="header">HOSPITALIZED</div>
+        <div class="numbers">{{formatter.format(selectedState.hospitalized)}}</div>
+        <div class="header">DEATHS</div>
+        <div class="numbers">{{formatter.format(selectedState.death)}}</div>
+      </div>
+
+      <div class="disclaimer" v-if="selectedState">
+        Data is from: {{selectedState.lastUpdateEt}} ET.
+        <span v-if="selectedState.grade !== 'A'">Quality of data from this state is not the best.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var helloApp = new Vue({
+      el: '.dashboard',
+      data: {
+        updateInterval: 30,
+        formatter: new Intl.NumberFormat,
+        selectedState: undefined,
+        stateList: [],
+        timer: undefined
+      },
+      methods: {
+        updateDisplay() {
+          console.log("Updating display")
+
+          return fetch("https://covidtracking.com/api/states")
+            .then(response => response.json())
+            .then(data => {
+              this.stateList = data
+
+              if (this.selectedState === undefined) {
+                this.selectedState = this.stateList[0]
+              } else {
+                //Choose the last selected state
+                this.selectedState = this.stateList.find(s => s.state === this.selectedState.state)
+              }
+            })
+        },
+        startNewTimer() {
+          if (this.timer !== undefined) {
+            console.log("Stopping old timer")
+            clearInterval(this.timer)
+          }
+
+          console.log("Starting new timer", this.updateInterval * 60 * 1000)
+
+          this.timer = setInterval(
+            () => this.updateDisplay(),
+            this.updateInterval * 60 * 1000)
+        }
+      },
+      mounted() {
+        this.updateDisplay()
+          .catch(err => alert("Sorry there was an error. Please try again."))
+
+        this.startNewTimer()
+      },
+      computed: {
+        dataQuality() {
+          if (this.selectedState.grade === 'A') return 'Very good'
+          else if (this.selectedState.grade === 'B') return 'Good'
+          else return 'Poor'
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
