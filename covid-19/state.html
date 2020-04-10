@@ -40,8 +40,9 @@
     }
 
     .extra-data {
-      font-size: 0.75em;
+      font-size: 0.6em;
       font-weight: normal;
+      display: block;
     }
 
     .disclaimer {
@@ -60,7 +61,7 @@
       <div class="toolbar">
         <div>
           State:
-          <select v-model="selectedState" @change="calculateExtraData">
+          <select v-model="selectedState">
             <option v-for="s in stateList" :value="s">{{s.state}}</option>
           </select>
         </div>
@@ -76,22 +77,23 @@
         </div>
       </div>
 
-      <div class="stats" v-if="selectedState">
+      <div class="stats" v-if="selectedState && populationList">
         <div class="header">TOTAL TESTED</div>
-        <div class="numbers">{{formatter.format(selectedState.totalTestResults)}}. 
-          <span class="extra-data" v-if="extraData">{{extraData.testPerThousand}} per 1000 residents.</span>
+        <div class="numbers">{{formatter.format(selectedState.totalTestResults)}} 
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.testPerThousand)}} per 1000 residents.<br/>Avg: {{Math.round(nationalAverage.testPerThousand)}} per 1000 residents.</span>
         </div>
         <div class="header">TESTED POSITIVE</div>
-        <div class="numbers">{{formatter.format(selectedState.positive)}}.
-          <span class="extra-data" v-if="extraData">{{extraData.positivePercent}}% of tested.</span>
+        <div class="numbers">{{formatter.format(selectedState.positive)}}
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.positivePercent)}}% of tested.<br/>Avg: {{Math.round(nationalAverage.positivePercent)}}% of tested.</span>
         </div>
         <div class="header">HOSPITALIZED</div>
-        <div class="numbers">{{formatter.format(selectedState.hospitalized)}}.
-          <span class="extra-data" v-if="extraData">{{extraData.hospitalizedPercent}}% of positive.</span>
+        <div class="numbers" v-if="selectedState.hospitalized">{{formatter.format(selectedState.hospitalized)}}
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.hospitalizedPercent)}}% of positive.<br/>Avg: {{Math.round(nationalAverage.hospitalizedPercent)}}% of positive.</span>
         </div>
+        <div class="numbers" v-else><span class="extra-data">Data not available.</span></div>
         <div class="header">DEATHS</div>
-        <div class="numbers">{{formatter.format(selectedState.death)}}.
-          <span class="extra-data" v-if="extraData">{{extraData.deathPercent}}% of positive.</span>
+        <div class="numbers">{{formatter.format(selectedState.death)}}
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.deathPercent)}}% of positive.<br/>Avg: {{Math.round(nationalAverage.deathPercent)}}% of positive.</span>
         </div>
       </div>
 
@@ -110,8 +112,7 @@
         formatter: new Intl.NumberFormat,
         selectedState: undefined,
         stateList: [],
-        extraData: undefined,
-        populationList: [],
+        populationList: undefined,
         timer: undefined
       },
       methods: {
@@ -121,6 +122,7 @@
           return fetch("https://covidtracking.com/api/states")
             .then(response => response.json())
             .then(data => {
+              console.log("Got covid data")
               this.stateList = data
 
               if (this.selectedState === undefined) {
@@ -134,18 +136,51 @@
             })
         },
         calculateExtraData() {
-          if (this.selectedState === undefined || this.populationList === undefined || this.populationList.length == 0) {
+          if (this.stateList === undefined || this.stateList.length === 0 || this.populationList === undefined || this.populationList.length == 0) {
             return
           }
 
-          let population = this.populationList.find(p => p.state === this.selectedState.state).population
+          this.stateList.forEach(s => {
+            let statePop = this.populationList.find(p => p.state === s.state)
 
-          this.extraData = {}
-          this.extraData.testPerThousand = Math.round((this.selectedState.totalTestResults * 1000.0) / (population))
-          this.extraData.positivePercent = Math.round((this.selectedState.positive * 100.0) / (this.selectedState.totalTestResults))
-          this.extraData.hospitalizedPercent = Math.round((this.selectedState.hospitalized * 100.0) / (this.selectedState.positive))
-          this.extraData.deathPercent = Math.round((this.selectedState.death * 100.0) / (this.selectedState.positive))
+            if (statePop === undefined) {
+              //A few states have no population data
+              return
+            }
 
+            s.extraData = {}
+            s.extraData.testPerThousand = (s.totalTestResults * 1000.0) / (statePop.population)
+            s.extraData.positivePercent = (s.positive * 100.0) / (s.totalTestResults)
+            s.extraData.hospitalizedPercent = (s.hospitalized * 100.0) / (s.positive)
+            s.extraData.deathPercent = (s.death * 100.0) / (s.positive)
+          })
+
+          let statesWithExtraData = this.stateList.filter(s => s.extraData !== undefined)
+          
+          this.nationalAverage = {
+            testPerThousand: 0,
+            positivePercent: 0,
+            hospitalizedPercent: 0,
+            deathPercent: 0
+          }
+
+          var missingHospitalization = 0
+
+          statesWithExtraData.forEach(s => {
+            this.nationalAverage.testPerThousand += s.extraData.testPerThousand
+            this.nationalAverage.positivePercent += s.extraData.positivePercent
+            this.nationalAverage.hospitalizedPercent += s.extraData.hospitalizedPercent
+            this.nationalAverage.deathPercent += s.extraData.deathPercent
+
+            if (s.extraData.hospitalizedPercent == 0) {
+              ++missingHospitalization
+            }
+          })
+
+          this.nationalAverage.testPerThousand /= statesWithExtraData.length
+          this.nationalAverage.positivePercent /= statesWithExtraData.length
+          this.nationalAverage.hospitalizedPercent /= (statesWithExtraData.length - missingHospitalization)
+          this.nationalAverage.deathPercent /= statesWithExtraData.length
         },
         startNewTimer() {
           if (this.timer !== undefined) {
@@ -163,8 +198,12 @@
       mounted() {
         fetch("population.json")
           .then(response => response.json())
-          .then(data => this.populationList = data)
-          .then(() => this.calculateExtraData())
+          .then(data => {
+            console.log("Got population data")
+            this.populationList = data
+            
+            this.calculateExtraData()
+          })
 
         this.updateDisplay()
           .catch(err => alert("Sorry there was an error. Please try again."))
