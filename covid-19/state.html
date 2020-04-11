@@ -80,20 +80,20 @@
       <div class="stats" v-if="selectedState && populationList">
         <div class="header">TOTAL TESTED</div>
         <div class="numbers">{{formatter.format(selectedState.totalTestResults)}} 
-          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.testPerThousand)}} per 1000 residents.<br/>Avg: {{Math.round(nationalAverage.testPerThousand)}} per 1000 residents.</span>
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.testPerThousand)}} per 1000 residents.<br/>US Avg. {{Math.round(nationalAverage.testPerThousand)}} per 1000 residents.</span>
         </div>
         <div class="header">TESTED POSITIVE</div>
         <div class="numbers">{{formatter.format(selectedState.positive)}}
-          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.positivePercent)}}% of tested.<br/>Avg: {{Math.round(nationalAverage.positivePercent)}}% of tested.</span>
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.positivePercent)}}% of tested.<br/>US Avg. {{Math.round(nationalAverage.positivePercent)}}% of tested.</span>
         </div>
         <div class="header">HOSPITALIZED</div>
         <div class="numbers" v-if="selectedState.hospitalized">{{formatter.format(selectedState.hospitalized)}}
-          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.hospitalizedPercent)}}% of positive.<br/>Avg: {{Math.round(nationalAverage.hospitalizedPercent)}}% of positive.</span>
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.hospitalizedPercent)}}% of positive.<br/>US Avg. {{Math.round(nationalAverage.hospitalizedPercent)}}% of positive.</span>
         </div>
         <div class="numbers" v-else><span class="extra-data">Data not available.</span></div>
         <div class="header">DEATHS</div>
         <div class="numbers">{{formatter.format(selectedState.death)}}
-          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.deathPercent)}}% of positive.<br/>Avg: {{Math.round(nationalAverage.deathPercent)}}% of positive.</span>
+          <span class="extra-data" v-if="selectedState.extraData">{{Math.round(selectedState.extraData.deathPercent)}}% of positive.<br/>US Avg. {{Math.round(nationalAverage.deathPercent)}}% of positive.</span>
         </div>
       </div>
 
