@@ -249,30 +249,52 @@
 
           this.computeMovingAvg(stateData, labelList, maList, this.selectedProperty.name)
 
-          // maList.forEach(avg => console.log(avg))
-          this.renderGraph(labelList, maList, this.selectedProperty)
+          let actualValues = stateData.map(s => s[this.selectedProperty.name])
+
+          this.renderGraph(labelList, maList, this.selectedProperty, actualValues)
         },
         computeMovingAvg(stateData, labelList, maList, propertyName) {
-          for (i = 0; i < stateData.length - this.movingAverageDays; ++i) {
+          //Pad MA list so the length matches actual values
+          for (let i = 0; i < this.movingAverageDays; ++i) {
+            maList.push(null)
+          }
+
+          for (let i = 0; i < stateData.length - this.movingAverageDays; ++i) {
             let sum = 0
 
-            for (j = i; j < i + this.movingAverageDays; ++j) {
+            for (let j = i; j < i + this.movingAverageDays; ++j) {
               let incr = stateData[j][propertyName] !== null ? stateData[j][propertyName] : 0
 
               sum += incr
             }
-            labelList.push(i)
+
             maList.push(sum / this.movingAverageDays)
           }
-        },
-        renderGraph(labelList, maList, prop) {
-          this.chart.data.labels = labelList
-          this.chart.data.datasets[0] = {
-            data: maList,
-            label: prop.label,
-            borderColor: prop.color,
-            fill: false
+
+          for (let i = 0; i < stateData.length; ++i) {
+            labelList.push(i)
           }
+        },
+        renderGraph(labelList, maList, prop, actualValues) {
+          console.log(maList.length, actualValues.length)
+
+          this.chart.data.labels = labelList
+          
+          this.chart.data.datasets[0] = {
+            data: actualValues,
+            label: prop.label,
+            borderColor: "#00ff00",
+            fill: false,
+          }
+
+          this.chart.data.datasets[1] = {
+            data: maList,
+            label: "Actual values",
+            borderColor: prop.color,
+            fill: false,
+            type: 'line'
+          }
+          
           this.chart.update()
         }
       },
@@ -280,7 +302,7 @@
         let ctx = document.getElementById('chart').getContext('2d')
 
         this.chart = new Chart(ctx, {
-          type: 'line',
+          type: 'bar',
           data: {
             labels: [],
             datasets: []
