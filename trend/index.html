@@ -179,19 +179,18 @@
                     let lastPositive = lastPositiveMap.get(state) ? lastPositiveMap.get(state) : 0
                     let lastDeath = lastDeathMap.get(state) ? lastDeathMap.get(state) : 0
 
-                    let date = Date.parse(dayStr)
+                    let dateActual = new Date(dayStr)
+                    let date = dateActual.getTime()
+                    let dateLabel = `${dateActual.getMonth() + 1}/${dateActual.getDate()}`
                     let positiveIncrease = cases - lastPositive
                     let deathIncrease = deaths - lastDeath
-
-                    // if (state === "Florida") {
-                    //   console.log(dayStr, cases, deaths, positiveIncrease, deathIncrease)
-                    // }
 
                     lastPositiveMap.set(state, cases)
                     lastDeathMap.set(state, deaths)
 
                     return {
                       date,
+                      dateLabel,
                       state,
                       positiveIncrease,
                       deathIncrease
@@ -208,6 +207,15 @@
             fetchData() {
               return fetch("https://covidtracking.com/api/states/daily")
                 .then(response => response.json())
+                .then(dataList => {
+                  return dataList.map(s => {
+                    let date = new Date(s.dateChecked)
+
+                    s.dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
+
+                    return s
+                  })
+                })
             }
           }
         ],
@@ -270,10 +278,8 @@
 
             maList.push(sum / this.movingAverageDays)
           }
-
-          for (let i = 0; i < stateData.length; ++i) {
-            labelList.push(i)
-          }
+          //Setup the labels
+          stateData.forEach(s => labelList.push(s.dateLabel))
         },
         renderGraph(labelList, maList, prop, actualValues) {
           console.log(maList.length, actualValues.length)
@@ -282,14 +288,13 @@
           
           this.chart.data.datasets[0] = {
             data: actualValues,
-            label: prop.label,
-            borderColor: "#00ff00",
-            fill: false,
+            label: `Actual ${prop.label}`,
+            fill: true,
           }
 
           this.chart.data.datasets[1] = {
             data: maList,
-            label: "Actual values",
+            label: `${this.movingAverageDays}d Moving average`,
             borderColor: prop.color,
             fill: false,
             type: 'line'
