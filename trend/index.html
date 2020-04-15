@@ -94,6 +94,15 @@
           </select>
           moving average.
         </div>
+        <div>
+          Show last 
+          <select v-model="showNumLastDays" @change="processData">
+            <option :value="15">15</option>
+            <option :value="30">30</option>
+            <option :value="60">60</option>
+          </select>
+          days only.
+        </div>
       </div>
     </modal-dialog>
     <canvas id="chart"></canvas>
@@ -139,6 +148,7 @@
         stateList: [],
         historyData: [],
         movingAverageDays: 3,
+        showNumLastDays: 30,
         selectedProperty: undefined,
         chart: undefined,
         propertyList: [
@@ -190,6 +200,7 @@
 
                     return {
                       date,
+                      dateActual,
                       dateLabel,
                       state,
                       positiveIncrease,
@@ -209,9 +220,10 @@
                 .then(response => response.json())
                 .then(dataList => {
                   return dataList.map(s => {
-                    let date = new Date(s.dateChecked)
+                    let dateActual = new Date(s.dateChecked)
 
-                    s.dateLabel = `${date.getMonth() + 1}/${date.getDate()}`
+                    s.dateActual = dateActual
+                    s.dateLabel = `${dateActual.getMonth() + 1}/${dateActual.getDate()}`
 
                     return s
                   })
@@ -244,8 +256,11 @@
           this.stateList.sort()
         },
         processData() {
+          let timeLimit = this.showNumLastDays * 24 * 60 * 60 * 1000
+          let cutOffTime = Date.now() - timeLimit
+
           let stateData = this.historyData
-            .filter(record => record.state === this.selectedState)
+            .filter(record => record.state === this.selectedState && record.dateActual.getTime() >= cutOffTime)
             .sort((r1, r2) => {
               if (r1.date < r2.date) return -1
               else if (r1.date > r2.date) return 1
@@ -282,10 +297,8 @@
           stateData.forEach(s => labelList.push(s.dateLabel))
         },
         renderGraph(labelList, maList, prop, actualValues) {
-          console.log(maList.length, actualValues.length)
-
           this.chart.data.labels = labelList
-          
+
           this.chart.data.datasets[0] = {
             data: actualValues,
             label: `Actual ${prop.label}`,
@@ -299,7 +312,7 @@
             fill: false,
             type: 'line'
           }
-          
+
           this.chart.update()
         }
       },
