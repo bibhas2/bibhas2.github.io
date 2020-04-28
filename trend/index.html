@@ -99,6 +99,7 @@
           <select v-model="showNumLastDays" @change="processData">
             <option :value="15">15</option>
             <option :value="30">30</option>
+            <option :value="45">45</option>
             <option :value="60">60</option>
           </select>
           days only.
@@ -147,8 +148,8 @@
         selectedState: "",
         stateList: [],
         historyData: [],
-        movingAverageDays: 3,
-        showNumLastDays: 30,
+        movingAverageDays: 7,
+        showNumLastDays: 45,
         selectedProperty: undefined,
         chart: undefined,
         propertyList: [
