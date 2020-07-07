@@ -1,0 +1,28 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="../book.js"></script>
+  <link rel="stylesheet" type="text/css" href="../book.css">
+  <title>Biography</title>
+
+  <style>
+    
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <book base-file-name="mother biography_" extension="jpg" :first-page="1" :last-page="100"></book>
+  </div>
+
+  <script>
+var app = new Vue({
+      el: '#app'
+})
+  </script>
+</body>
+
+</html>
