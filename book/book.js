@@ -1,7 +1,7 @@
 Vue.component("book", {
     template: `
 <div>
-    <img :src="currentFile" class="page" @click="next($event)"/>
+    <img :src="currentFile" class="page" @click="navigate($event)"/>
 </div>
     `,
     props: [
@@ -12,20 +12,50 @@ Vue.component("book", {
     ],
     data() {
         return {
-            currentPage: 0
+            currentPage: this.firstPage
         }
     },
     mounted() {
-        this.currentPage = this.firstPage
+        let savedPage = localStorage.getItem(this.baseFileName)
+
+        if (savedPage == null) {
+            console.log("Page was not saved")
+
+            return
+        }
+
+        savedPage = parseInt(savedPage)
+
+        if (savedPage >= this.firstPage && savedPage <= this.lastPage) {
+            this.currentPage = savedPage
+
+            console.log("Jumping to page", savedPage)
+        }
     },
     methods: {
-        next(e) {
+        next() {
             if (this.currentPage < this.lastPage) {
                 this.currentPage += 1
             }
         },
-        prev(e) {
+        prev() {
+            if (this.currentPage > this.firstPage) {
+                this.currentPage -= 1
+            }
+        },
+        navigate(e) {
+            let rect = e.target.getBoundingClientRect();
+            // console.log(e.clientX, e.clientY, rect)
+            if (e.clientX > rect.left + rect.width / 2.0) {
+                this.next()
+            } else {
+                this.prev()
+            }
 
+            this.saveLocation()
+        },
+        saveLocation() {
+            localStorage.setItem(this.baseFileName, this.currentPage.toString())
         }
     },
     computed: {
