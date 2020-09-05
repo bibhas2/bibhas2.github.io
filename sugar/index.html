@@ -1,0 +1,73 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <title>Blood Sugar Conversion Chart</title>
+
+  <style>
+    #app img {
+      width: 85px;
+      display: block;
+    }
+    #app div {
+      border-bottom: thin black solid;
+      padding-bottom: 4px;
+      padding-top: 4px;
+    }
+    #app {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1.3em;
+      max-width: 330px;
+      margin-left: 10px;
+    }
+    .header {
+      font-size: 1.7em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <img src="canada-flag.svg"/>
+    </div>
+    <div class="header">
+      <img src="us-flag.svg"/>
+    </div>
+    <template v-for="pair in list">
+      <div>{{pair[0]}}</div>
+      <div>{{pair[1]}}</div>
+    </template>
+  </div>
+
+  <script>
+var app = new Vue({
+      el: '#app',
+      data: {
+          list: []
+      },
+      methods: {
+        canadaToUS(v) {
+          return v * 18.02
+        },
+        convertAndAdd(v) {
+          this.list.push([v, this.canadaToUS(v)])
+        }
+      },
+      mounted() {
+        this.convertAndAdd(1.0)
+        this.convertAndAdd(1.5)
+
+        for (let i = 2; i < 26; ++i) {
+          this.convertAndAdd(i)
+        }
+      }
+})
+  </script>
+</body>
+
+</html>
