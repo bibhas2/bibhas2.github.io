@@ -115,3 +115,7 @@ wValue.update = function() {
 transformedData.forEach(pair => {
     interactive.circle(pair[0], pair[1], 5)
 })
+
+let xLabel = interactive.text(100, -10, "Foot Traffic/hr")
+xLabel.setAttribute('transform', `rotate(${-90})`)
+let yLabel = interactive.text(200, 20, "Temperature (F)")
