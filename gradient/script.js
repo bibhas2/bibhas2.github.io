@@ -37,6 +37,15 @@ class Transformer {
     toSVG(pair) {
         return [pair[0]/this.xscale, - (pair[1]/this.yscale)]
     }
+    fromSVG(pair) {
+        return [pair[0] * this.xscale, - (pair[1] * this.yscale)]
+    }
+    getSlope(start, end) {
+        let startData = this.fromSVG([start.x, start.y])
+        let endData = this.fromSVG([end.x, end.y])
+
+        return (endData[1] - startData[1]) / (endData[0] - startData[0])
+    }
 }
 
 let footTrafficData = [
@@ -65,7 +74,7 @@ let interactive = new Interactive("my-interactive", {
 
 let xform = new Transformer(interactive)
 let transformedData = xform.setup(footTrafficData)
-let numFormatter = new Intl.NumberFormat(undefined, {maximumFractionDigits: 2})
+let numFormatter = new Intl.NumberFormat(undefined, {maximumFractionDigits: 3})
 let coord = xform.toSVG([0, xform.ymin])
 let start = interactive.control(coord[0], coord[1])
 
@@ -98,18 +107,24 @@ line.update = function () {
     this.y2 = end.y;
 }
 
-let bValue = interactive.text( start.x + 10, start.y + 10, `b: ${numFormatter.format(start.y)}`)
+coord = xform.fromSVG([0, start.y])
+let bValue = interactive.text( start.x + 10, start.y + 10, `b: ${numFormatter.format(coord[1])}`)
 bValue.addDependency(start)
 bValue.update = function() {
     bValue.y += start.dy
-    bValue.contents = `b: ${numFormatter.format(start.y)}`
+
+    let pair = xform.fromSVG([0, start.y])
+
+    bValue.contents = `b: ${numFormatter.format(pair[1])}`
 }
 
-let wValue = interactive.text( end.x - 80, end.y - 10, `W: ${numFormatter.format(end.y)}`)
+let slope = xform.getSlope(start, end)
+let wValue = interactive.text( end.x - 80, end.y - 10, `W: ${numFormatter.format(slope)}`)
 wValue.addDependency(end)
 wValue.update = function() {
     wValue.y += end.dy
-    wValue.contents = `W: ${numFormatter.format(end.y)}`
+    let slope = xform.getSlope(start, end)
+    wValue.contents = `W: ${numFormatter.format(slope)}`
 }
 
 transformedData.forEach(pair => {
