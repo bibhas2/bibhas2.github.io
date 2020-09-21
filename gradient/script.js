@@ -53,7 +53,7 @@ let footTrafficData = [
     // [100, 100],
     // [200, 200]
 ]
-let margin = 10
+let margin = 40
 
 // Construct an interactive within the HTML element with the id "my-interactive"
 let interactive = new Interactive("my-interactive", {
@@ -70,7 +70,7 @@ let coord = xform.toSVG([0, xform.ymin])
 let start = interactive.control(coord[0], coord[1])
 
 coord = xform.toSVG([0, xform.ymax])
-let end = interactive.control(interactive.width - 50, coord[1])
+let end = interactive.control(interactive.width - 2 * margin, coord[1])
 let line = interactive.line(start.x, start.y, end.x, end.y)
 
 let xAxis = interactive.line(0, 0, interactive.width - margin, 0);
@@ -105,7 +105,7 @@ bValue.update = function() {
     bValue.contents = `b: ${numFormatter.format(start.y)}`
 }
 
-let wValue = interactive.text( end.x - 20, end.y - 10, `W: ${numFormatter.format(end.y)}`)
+let wValue = interactive.text( end.x - 80, end.y - 10, `W: ${numFormatter.format(end.y)}`)
 wValue.addDependency(end)
 wValue.update = function() {
     wValue.y += end.dy
