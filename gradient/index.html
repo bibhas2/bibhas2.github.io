@@ -1,64 +1,81 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gradient Descent</title>
-    <link rel="stylesheet" href="https://vectorjs.org/library.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <style>
-      #my-interactive {
-        width: 600px;
-        height: 400px;
-      }
-      .app-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        font-family: Arial, Helvetica, sans-serif;
-        max-width: 1200px;
-      }
-      .data-table {
-        display: grid;
-        grid-template-columns: auto auto auto auto;
-        max-width: 510px;
-        margin-left: 50px;
-      }
-      .table-description {
-        grid-column: span 4;
-      }
-      .table-header {
-        background-color: black;
-        color: white;
-        text-align: center;
-        font-weight: bold;
-        padding-top: 7px;
-      }
-      .data-cell {
-        padding-left: 10px;
-      }
-      .rmse-label {
-        grid-column: span 3;
-        border-top: thin gray solid;
-        padding-top: 10px;
-        padding-left: 10px;
-      }
-      .rmse-value {
-        border-top: thin gray solid;
-        padding-top: 10px;
-        padding-left: 10px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="app-container">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gradient Descent</title>
+  <link rel="stylesheet" href="https://vectorjs.org/library.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #my-interactive {
+      width: 600px;
+      height: 400px;
+    }
+
+    .app-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 1200px;
+    }
+
+    .data-table {
+      display: grid;
+      grid-template-columns: auto auto auto auto;
+      max-width: 510px;
+      margin-left: 50px;
+    }
+
+    .table-description {
+      grid-column: span 4;
+    }
+
+    .table-header {
+      background-color: black;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      padding-top: 7px;
+      margin-bottom: 5px;
+    }
+
+    .data-cell {
+      padding-left: 10px;
+    }
+
+    .rmse-label {
+      grid-column: span 3;
+      border-top: thin gray solid;
+      padding-top: 10px;
+      padding-left: 10px;
+    }
+
+    .rmse-value {
+      border-top: thin gray solid;
+      padding-top: 10px;
+      padding-left: 10px;
+    }
+    .definitions {
+      margin: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
     <div id="my-interactive"></div>
     <div class="data-table">
       <div class="table-description">
         Correlation of Foot Traffic (Customers/hour) with Temperature.
       </div>
-      <div class="table-header">Temperature<br/>(x)</div>
-      <div class="table-header">Actual<br/>Foot Traffic<br/>(y)</div>
-      <div class="table-header">Predicted<br/>Foot Traffic<br/>(y')</div>
+      <div class="table-header">Temperature<br />(x)</div>
+      <div class="table-header">Actual<br />Foot Traffic<br />(y)</div>
+      <div class="table-header">Predicted<br />Foot Traffic<br />(y')</div>
       <div class="table-header">Error</div>
       <template v-for="sample in sourceData">
         <div class="data-cell">{{fmt(sample[0])}}</div>
@@ -71,7 +88,66 @@
       </div>
       <div class="rmse-value">{{rmseFormatted}}</div>
     </div>
-    </div>
-    <script type="module" src="script.js"></script>
-  </body>
+
+  </div>
+
+  <div class="definitions">
+    <h2>DEFINITIONS</h2>
+    <h3>Features</h3>
+    <p>
+      Features are the independent variables in a model. Here the observed temperature is the feature. Foot traffic
+      depends on it. We use the symbol <b>x</b> for labels.
+    </p>
+    <h3>Label</h3>
+    <p>
+      A label is the observed effect. Here the actual foot traffic is the label. We
+      will use the symbol <b>y</b> to represent a label.
+    </p>
+    <h3>Weight</h3>
+    <p>Weight is the slope of the line we fit through the observed data samples. We use the symbol
+      <b>W</b> for it.
+    </p>
+    <h3>Bias</h3>
+    <p>Bias is the y intercept of the line we fit through the data sample. We use the symbol
+      <b>b</b> for it.</p>
+    <h3>Prediction</h3>
+    <p>This is the value of a label predicted by the line we fit through the data samples.
+      We use the symbol <b>y'</b> or <b>y_</b> for it. Prediction is computed using the equation.
+      $$
+      y' = W \times x + b
+      $$
+
+      The goal of a model is to find the most optimal values of <b>W</b> and <b>b</b> that will give us the
+      highest quality predictions. Sadly we can not use algebra to solve the equation for <b>W</b> and <b>b</b>.
+    </p>
+    <h3>Error or Cost</h3>
+    <p>
+      Error measures the accuracy of our predictions or how good a job we have done fitting the line through the observed data samples. We use the
+      symbol <b>J</b> for it. Root Mean
+      Square Error (RMSE) is a very effective and common way to measure the overall error of a model.
+      It is calculated using this equation. Here <b>m</b> is the number of data samples.
+
+      $$
+      J = \frac{1}{2m} \sum (y - y')^{2}
+      $$
+
+      By replacing the value of <b>y'</b> we get.
+
+      $$
+      J = \frac{1}{2m} \sum (y - (W \times x + b))^{2}
+      $$
+
+      Here <b>x</b> and <b>y</b> are the observed data points. This makes <b>J</b> solely a function of
+      <b>W</b> and <b>b</b>. This equation is still not enough to solve for <b>W</b> and <b>b</b>.
+    </p>
+    <h3>Optimization</h3>
+    <p>
+      Various algorithms exist in Machine Learning (ML) that can approximately solve for <b>W</b> and <b>b</b>. 
+      They do this by repeatedly trying out different values of <b>W</b> and <b>b</b> until we achieve an acceptable error value.
+      This is called optimization or error minimization.
+    </p>
+  </div>
+  <script type="module" src="script.js"></script>
+</body>
+
 </html>
