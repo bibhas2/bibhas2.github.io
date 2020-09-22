@@ -3,18 +3,57 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Getting Started</title>
+    <title>Gradient Descent</title>
     <link rel="stylesheet" href="https://vectorjs.org/library.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <style>
       #my-interactive {
         width: 600px;
         height: 400px;
-        /* border: thin black solid; */
+      }
+      .app-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .data-table {
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+      }
+      .table-description {
+        grid-column: span 4;
+      }
+      .table-header {
+        background-color: black;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 7px;
+      }
+      .data-cell {
+        padding-left: 10px;
       }
     </style>
   </head>
   <body>
+    <div class="app-container">
     <div id="my-interactive"></div>
+    <div class="data-table">
+      <div class="table-description">
+        Foot Traffic (Customers/hour) Pattern
+      </div>
+      <div class="table-header">Temperature<br/>(x)</div>
+      <div class="table-header">Actual<br/>Foot Traffic<br/>(y)</div>
+      <div class="table-header">Predicted<br/>Foot Traffic<br/>(y')</div>
+      <div class="table-header">Error</div>
+      <template v-for="sample in sourceData">
+        <div class="data-cell">{{sample[0]}}</div>
+        <div class="data-cell">{{sample[1]}}</div>
+        <div class="data-cell">{{predict(sample[0])}}</div>
+        <div class="data-cell">{{error(sample[0], sample[1])}}</div>
+      </template>
+    </div>
+    </div>
     <script type="module" src="script.js"></script>
   </body>
 </html>

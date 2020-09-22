@@ -8,7 +8,7 @@ class Transformer {
     ymin = 0
     ymax = 0
 
-    constructor(svg){
+    constructor(svg) {
         this.svg = svg
     }
 
@@ -22,20 +22,20 @@ class Transformer {
         this.ymax = ymax
 
         let [xsum, ysum] = data.reduce((last, pair) => [last[0] + pair[0], last[1] + pair[1]])
-        
+
         let xavg = xsum / data.length
         let yavg = ysum / data.length
 
         this.xscale = (2 * xavg) / (this.svg.width - this.svg.originX)
         this.yscale = (2 * yavg) / this.svg.originY
 
-        let transformedData = data.map(pair => [pair[0]/this.xscale, - (pair[1]/this.yscale)])
+        let transformedData = data.map(pair => [pair[0] / this.xscale, - (pair[1] / this.yscale)])
 
         return transformedData
     }
 
     toSVG(pair) {
-        return [pair[0]/this.xscale, - (pair[1]/this.yscale)]
+        return [pair[0] / this.xscale, - (pair[1] / this.yscale)]
     }
     fromSVG(pair) {
         return [pair[0] * this.xscale, - (pair[1] * this.yscale)]
@@ -48,89 +48,102 @@ class Transformer {
     }
 }
 
-let footTrafficData = [
-    [30, 4],
-    [40, 5],
-    [45, 5],
-    [50, 5.6],
-    [60, 6],
-    [65, 7.5],
-    [70, 8.],
-    [75, 8.5],
-    [80, 8.75]
-    // [0, 0],
-    // [100, 100],
-    // [200, 200]
-]
-let margin = 40
+var app = new Vue({
+    el: '.data-table',
+    data: {
+        sourceData: [
+            [30, 4],
+            [40, 5],
+            [45, 5],
+            [50, 5.6],
+            [60, 6],
+            [65, 7.5],
+            [70, 8.],
+            [75, 8.5],
+            [80, 8.75]
+        ],
+        margin: 40,
+        interactive: undefined,
+        xform: undefined,
+        transformedData: undefined,
+        numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 })
+    },
+    methods: {
+        predict(temp) {
+            return 0.0
+        },
+        error(temp, actual) {
+            return this.predict(temp) - actual
+        }
+    },
+    mounted() {
+        this.interactive = new Interactive("my-interactive", {
+            width: 600,
+            height: 400,
+            originX: this.margin,
+            originY: 400 - this.margin
+        })
+        this.xform = new Transformer(this.interactive)
+        this.transformedData = this.xform.setup(this.sourceData)
 
-// Construct an interactive within the HTML element with the id "my-interactive"
-let interactive = new Interactive("my-interactive", {
-    width: 600,
-    height: 400,
-    originX: margin,
-    originY: 400 - margin
-});
+        let coord = this.xform.toSVG([0, this.xform.ymin])
+        let start = this.interactive.control(coord[0], coord[1])
 
-let xform = new Transformer(interactive)
-let transformedData = xform.setup(footTrafficData)
-let numFormatter = new Intl.NumberFormat(undefined, {maximumFractionDigits: 3})
-let coord = xform.toSVG([0, xform.ymin])
-let start = interactive.control(coord[0], coord[1])
+        coord = this.xform.toSVG([0, this.xform.ymax])
+        let end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
+        let line = this.interactive.line(start.x, start.y, end.x, end.y)
 
-coord = xform.toSVG([0, xform.ymax])
-let end = interactive.control(interactive.width - 2 * margin, coord[1])
-let line = interactive.line(start.x, start.y, end.x, end.y)
+        let xAxis = this.interactive.line(0, 0, this.interactive.width - this.margin, 0);
+        let yAxis = this.interactive.line(0, 0, 0, -this.interactive.height + this.margin);
+        let marker = this.interactive.marker(10, 5, 10, 10);
+        marker.path('M 0 0 L 10 5 L 0 10 z').style.fill = '#404040';
+        marker.setAttribute('orient', 'auto-start-reverse');
+        xAxis.setAttribute('marker-end', `url(#${marker.id})`);
+        yAxis.setAttribute('marker-end', `url(#${marker.id})`);
 
-let xAxis = interactive.line(0, 0, interactive.width - margin, 0);
-let yAxis = interactive.line(0, 0, 0, -interactive.height + margin);
-let marker = interactive.marker(10, 5, 10, 10);
-marker.path('M 0 0 L 10 5 L 0 10 z').style.fill = '#404040';
-marker.setAttribute('orient', 'auto-start-reverse');
-xAxis.setAttribute('marker-end', `url(#${marker.id})`);
-yAxis.setAttribute('marker-end', `url(#${marker.id})`);
+        start.constrainToY()
+        end.constrainToY()
 
-start.constrainToY()
-end.constrainToY()
+        end.addDependency(start)
+        end.update = function () {
+            end.y = end.y + start.dy
+        }
 
-end.addDependency(start)
-end.update = function() { 
-    end.y = end.y + start.dy
-}
+        line.addDependency(start)
+        line.addDependency(end)
+        line.update = () => {
+            line.x1 = start.x;
+            line.y1 = start.y;
+            line.x2 = end.x;
+            line.y2 = end.y;
+        }
 
-line.addDependency(start)
-line.addDependency(end)
-line.update = function () {
-    this.x1 = start.x;
-    this.y1 = start.y;
-    this.x2 = end.x;
-    this.y2 = end.y;
-}
+        coord = this.xform.fromSVG([0, start.y])
+        let bValue = this.interactive.text(start.x + 10, start.y + 10, `b: ${this.numFormatter.format(coord[1])}`)
+        bValue.addDependency(start)
+        bValue.update = () => {
+            bValue.y += start.dy
 
-coord = xform.fromSVG([0, start.y])
-let bValue = interactive.text( start.x + 10, start.y + 10, `b: ${numFormatter.format(coord[1])}`)
-bValue.addDependency(start)
-bValue.update = function() {
-    bValue.y += start.dy
+            let pair = this.xform.fromSVG([0, start.y])
 
-    let pair = xform.fromSVG([0, start.y])
+            bValue.contents = `b: ${this.numFormatter.format(pair[1])}`
+        }
 
-    bValue.contents = `b: ${numFormatter.format(pair[1])}`
-}
+        let slope = this.xform.getSlope(start, end)
+        let wValue = this.interactive.text(end.x - 80, end.y - 10, `W: ${this.numFormatter.format(slope)}`)
+        wValue.addDependency(end)
+        wValue.update = () => {
+            wValue.y += end.dy
+            let slope = this.xform.getSlope(start, end)
+            wValue.contents = `W: ${this.numFormatter.format(slope)}`
+        }
 
-let slope = xform.getSlope(start, end)
-let wValue = interactive.text( end.x - 80, end.y - 10, `W: ${numFormatter.format(slope)}`)
-wValue.addDependency(end)
-wValue.update = function() {
-    wValue.y += end.dy
-    let slope = xform.getSlope(start, end)
-    wValue.contents = `W: ${numFormatter.format(slope)}`
-}
+        this.transformedData.forEach(pair => {
+            this.interactive.circle(pair[0], pair[1], 5)
+        })
 
-transformedData.forEach(pair => {
-    interactive.circle(pair[0], pair[1], 5)
+        let xLabel = this.interactive.text(100, -10, "Foot Traffic/hr")
+        xLabel.setAttribute('transform', `rotate(${-90})`)
+        let yLabel = this.interactive.text(200, 20, "Temperature (F)")
+    }
 })
-
-let xLabel = interactive.text(100, -10, "Foot Traffic/hr")
-xLabel.setAttribute('transform', `rotate(${-90})`)
-let yLabel = interactive.text(200, 20, "Temperature (F)")
