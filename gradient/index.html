@@ -33,6 +33,9 @@
       .data-cell {
         padding-left: 10px;
       }
+      .rmse-label {
+        grid-column: span 3;
+      }
     </style>
   </head>
   <body>
@@ -47,11 +50,15 @@
       <div class="table-header">Predicted<br/>Foot Traffic<br/>(y')</div>
       <div class="table-header">Error</div>
       <template v-for="sample in sourceData">
-        <div class="data-cell">{{sample[0]}}</div>
-        <div class="data-cell">{{sample[1]}}</div>
-        <div class="data-cell">{{predict(sample[0])}}</div>
-        <div class="data-cell">{{error(sample[0], sample[1])}}</div>
+        <div class="data-cell">{{fmt(sample[0])}}</div>
+        <div class="data-cell">{{fmt(sample[1])}}</div>
+        <div class="data-cell">{{fmt(predict(sample[0]))}}</div>
+        <div class="data-cell">{{fmt(error(sample[0], sample[1]))}}</div>
       </template>
+      <div class="rmse-label">
+        Root Mean Square Error (RMSE)
+      </div>
+      <div class="rmse-value">{{rmseFormatted}}</div>
     </div>
     </div>
     <script type="module" src="script.js"></script>

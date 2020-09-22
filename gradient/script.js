@@ -66,14 +66,34 @@ var app = new Vue({
         interactive: undefined,
         xform: undefined,
         transformedData: undefined,
-        numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 })
+        numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
+        W: 0,
+        b: 0,
+        rmse: 0,
     },
     methods: {
         predict(temp) {
-            return 0.0
+            return this.W * temp + this.b
         },
         error(temp, actual) {
             return this.predict(temp) - actual
+        },
+        fmt(n) {
+            return this.numFormatter.format(n)
+        },
+        updateRMSE() {
+            const sumErrorSquared = this.sourceData.reduce((sum, pair) => {
+                const err = this.error(pair[0], pair[1])
+
+                return sum + (err * err)
+            }, 0.0)
+
+            this.rmse = sumErrorSquared / (2 * this.sourceData.length)
+        }
+    },
+    computed: {
+        rmseFormatted() {
+            return this.fmt(this.rmse)
         }
     },
     mounted() {
@@ -119,31 +139,38 @@ var app = new Vue({
         }
 
         coord = this.xform.fromSVG([0, start.y])
-        let bValue = this.interactive.text(start.x + 10, start.y + 10, `b: ${this.numFormatter.format(coord[1])}`)
+        this.b = coord[1]
+        let bValue = this.interactive.text(start.x + 10, start.y + 10, `b: ${this.fmt(this.b)}`)
         bValue.addDependency(start)
         bValue.update = () => {
             bValue.y += start.dy
 
             let pair = this.xform.fromSVG([0, start.y])
+            this.b = pair[1]
+            bValue.contents = `b: ${this.fmt(this.b)}`
 
-            bValue.contents = `b: ${this.numFormatter.format(pair[1])}`
+            this.updateRMSE()
         }
 
-        let slope = this.xform.getSlope(start, end)
-        let wValue = this.interactive.text(end.x - 80, end.y - 10, `W: ${this.numFormatter.format(slope)}`)
+        this.W = this.xform.getSlope(start, end)
+        let wValue = this.interactive.text(end.x - 80, end.y - 10, `W: ${this.fmt(this.W)}`)
         wValue.addDependency(end)
         wValue.update = () => {
             wValue.y += end.dy
-            let slope = this.xform.getSlope(start, end)
-            wValue.contents = `W: ${this.numFormatter.format(slope)}`
+            this.W = this.xform.getSlope(start, end)
+            wValue.contents = `W: ${this.fmt(this.W)}`
+
+            this.updateRMSE()
         }
 
         this.transformedData.forEach(pair => {
             this.interactive.circle(pair[0], pair[1], 5)
         })
 
-        let xLabel = this.interactive.text(100, -10, "Foot Traffic/hr")
+        let xLabel = this.interactive.text(75, -10, "Foot Traffic. (Customers/hr)")
         xLabel.setAttribute('transform', `rotate(${-90})`)
         let yLabel = this.interactive.text(200, 20, "Temperature (F)")
+
+        this.updateRMSE()
     }
 })
