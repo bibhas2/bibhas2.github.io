@@ -96,7 +96,10 @@ Vue.component('gd-tool', {
             W: 0,
             b: 0,
             rmse: 0,
+            line: undefined,
             start: undefined,
+            bValue: undefined,
+            wValue: undefined,
             end: undefined,
             slider: undefined,
         }
@@ -121,23 +124,35 @@ Vue.component('gd-tool', {
             this.rmse = sumErrorSquared / (2 * this.sourceData.length)
         },
         trainingStep() {
-            let [dJ_dW, dJ_db] = this.sourceData
-                .map(pair => {
-                    const base = (this.predict(pair[0]) - pair[1])
+            for (let i = 0; i < 5000; ++i) {
+                let [dJ_dW, dJ_db] = this.sourceData
+                    .map(pair => {
+                        const base = (this.predict(pair[0]) - pair[1])
 
-                    return [base * pair[0], base]
-                })
-                .reduce((acc, current) => [acc[0] + current[0], acc[1] + current[1]], [0, 0])
-            
-            dJ_dW = dJ_dW / this.sourceData.length
-            dJ_db = dJ_db / this.sourceData.length
+                        return [base * pair[0], base]
+                    })
+                    .reduce((acc, current) => [acc[0] + current[0], acc[1] + current[1]], [0, 0])
 
-            this.W = this.W - this.slider.value * dJ_dW
-            this.b = this.b - this.slider.value * dJ_db
+                dJ_dW = dJ_dW / this.sourceData.length
+                dJ_db = dJ_db / this.sourceData.length
 
+                this.W = this.W - this.slider.value * dJ_dW
+                this.b = this.b - this.slider.value * dJ_db
+
+                // let coord = this.xform.toSVG([0, this.b])
+                // this.start.y = coord[1]
+                // this.start.y = -100
+            }
             this.updateRMSE()
 
-            console.log(this.W, this.b)
+            let coord = this.xform.toSVG([0, this.b])
+            this.start.y = coord[1]
+            this.end.y = this.start.y - this.W * (this.end.x - this.start.x)
+            this.bValue.update()
+            this.wValue.update()
+            this.line.update()
+
+            console.log(this.W, this.b, coord[1])
         }
     },
     mounted() {
@@ -155,7 +170,7 @@ Vue.component('gd-tool', {
 
         coord = this.xform.toSVG([0, this.xform.ymax])
         this.end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
-        let line = this.interactive.line(this.start.x, this.start.y, this.end.x, this.end.y)
+        this.line = this.interactive.line(this.start.x, this.start.y, this.end.x, this.end.y)
 
         let xAxis = this.interactive.line(0, 0, this.interactive.width - this.margin, 0);
         let yAxis = this.interactive.line(0, 0, 0, -this.interactive.height + this.margin);
@@ -168,43 +183,43 @@ Vue.component('gd-tool', {
         this.start.constrainToY()
         this.end.constrainToY()
 
-        if (this.mode == "normal") {
+        /*
             this.end.addDependency(this.start)
             this.end.update = () => {
                 this.end.y = this.end.y + this.start.dy
             }    
-        }
+        */
 
-        line.addDependency(this.start)
-        line.addDependency(this.end)
-        line.update = () => {
-            line.x1 = this.start.x;
-            line.y1 = this.start.y;
-            line.x2 = this.end.x;
-            line.y2 = this.end.y;
+        this.line.addDependency(this.start)
+        this.line.addDependency(this.end)
+        this.line.update = () => {
+            this.line.x1 = this.start.x;
+            this.line.y1 = this.start.y;
+            this.line.x2 = this.end.x;
+            this.line.y2 = this.end.y;
         }
 
         coord = this.xform.fromSVG([0, this.start.y])
         this.b = coord[1]
-        let bValue = this.interactive.text(this.start.x + 10, this.start.y + 10, `b: ${this.fmt(this.b)}`)
-        bValue.addDependency(this.start)
-        bValue.update = () => {
-            bValue.y += this.start.dy
+        this.bValue = this.interactive.text(this.start.x + 10, this.start.y + 10, `b: ${this.fmt(this.b)}`)
+        this.bValue.addDependency(this.start)
+        this.bValue.update = () => {
+            this.bValue.y += this.start.dy
 
             let pair = this.xform.fromSVG([0, this.start.y])
             this.b = pair[1]
-            bValue.contents = `b: ${this.fmt(this.b)}`
+            this.bValue.contents = `b: ${this.fmt(this.b)}`
 
             this.updateRMSE()
         }
 
         this.W = this.xform.getSlope(this.start, this.end)
-        let wValue = this.interactive.text(this.end.x - 80, this.end.y - 10, `W: ${this.fmt(this.W)}`)
-        wValue.addDependency(this.end)
-        wValue.update = () => {
-            wValue.y += this.end.dy
+        this.wValue = this.interactive.text(this.end.x - 80, this.end.y - 10, `W: ${this.fmt(this.W)}`)
+        this.wValue.addDependency(this.end)
+        this.wValue.update = () => {
+            this.wValue.y += this.end.dy
             this.W = this.xform.getSlope(this.start, this.end)
-            wValue.contents = `W: ${this.fmt(this.W)}`
+            this.wValue.contents = `W: ${this.fmt(this.W)}`
 
             this.updateRMSE()
         }
