@@ -64,29 +64,17 @@
       margin: 10px;
     }
   </style>
+  
+  <script type="module" src="script.js"></script>
+
 </head>
 
 <body>
   <div class="app-container">
     <div id="my-interactive"></div>
-    <div class="data-table">
-      <div class="table-description">
-        Correlation of Foot Traffic (Customers/hour) with Temperature.
-      </div>
-      <div class="table-header">Temperature<br />(x)</div>
-      <div class="table-header">Actual<br />Foot Traffic<br />(y)</div>
-      <div class="table-header">Predicted<br />Foot Traffic<br />(y')</div>
-      <div class="table-header">Error</div>
-      <template v-for="sample in sourceData">
-        <div class="data-cell">{{fmt(sample[0])}}</div>
-        <div class="data-cell">{{fmt(sample[1])}}</div>
-        <div class="data-cell">{{fmt(predict(sample[0]))}}</div>
-        <div class="data-cell">{{fmt(error(sample[0], sample[1]))}}</div>
-      </template>
-      <div class="rmse-label">
-        Root Mean Square Error (RMSE)
-      </div>
-      <div class="rmse-value">{{rmseFormatted}}</div>
+    <div class="app">
+      <h1>Hello</h1>
+      <gd-tool></gd-tool>
     </div>
 
   </div>
@@ -148,7 +136,14 @@
       This is called optimization or error minimization.
     </p>
   </div>
-  <script type="module" src="script.js"></script>
+
+  <script>
+  console.log("Declaring app")
+  var app = new Vue({
+      el: '.app',
+  })
+  </script>
+
 </body>
 
 </html>

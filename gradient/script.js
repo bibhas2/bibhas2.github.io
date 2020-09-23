@@ -47,29 +47,51 @@ class Transformer {
         return (endData[1] - startData[1]) / (endData[0] - startData[0])
     }
 }
-
-var app = new Vue({
-    el: '.data-table',
-    data: {
-        sourceData: [
-            [30, 6.5],
-            [40, 9],
-            [45, 9],
-            [50, 9.6],
-            [60, 10],
-            [65, 11.5],
-            [70, 12.],
-            [75, 12.5],
-            [80, 14.75]
-        ],
-        margin: 40,
-        interactive: undefined,
-        xform: undefined,
-        transformedData: undefined,
-        numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
-        W: 0,
-        b: 0,
-        rmse: 0,
+console.log("Declaring component")
+Vue.component('gd-tool', {
+    template: `
+    <div class="data-table">
+    <div class="table-description">
+      Correlation of Foot Traffic (Customers/hour) with Temperature.
+    </div>
+    <div class="table-header">Temperature<br />(x)</div>
+    <div class="table-header">Actual<br />Foot Traffic<br />(y)</div>
+    <div class="table-header">Predicted<br />Foot Traffic<br />(y')</div>
+    <div class="table-header">Error<br/>(y - y')</div>
+    <template v-for="sample in sourceData">
+      <div class="data-cell">{{fmt(sample[0])}}</div>
+      <div class="data-cell">{{fmt(sample[1])}}</div>
+      <div class="data-cell">{{fmt(predict(sample[0]))}}</div>
+      <div class="data-cell">{{fmt(error(sample[0], sample[1]))}}</div>
+    </template>
+    <div class="rmse-label">
+      Root Mean Square Error (RMSE)
+    </div>
+    <div class="rmse-value">{{rmseFormatted}}</div>
+    </div>
+    `,
+    data() {
+        return {
+            sourceData: [
+                [30, 6.5],
+                [40, 9],
+                [45, 9],
+                [50, 9.6],
+                [60, 10],
+                [65, 11.5],
+                [70, 12.],
+                [75, 12.5],
+                [80, 14.75]
+            ],
+            margin: 40,
+            interactive: undefined,
+            xform: undefined,
+            transformedData: undefined,
+            numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
+            W: 0,
+            b: 0,
+            rmse: 0,
+        }
     },
     methods: {
         predict(temp) {
@@ -89,11 +111,6 @@ var app = new Vue({
             }, 0.0)
 
             this.rmse = sumErrorSquared / (2 * this.sourceData.length)
-        }
-    },
-    computed: {
-        rmseFormatted() {
-            return this.fmt(this.rmse)
         }
     },
     mounted() {
@@ -172,5 +189,10 @@ var app = new Vue({
         let yLabel = this.interactive.text(200, 20, "Temperature (F)")
 
         this.updateRMSE()
-    }
+    },
+    computed: {
+        rmseFormatted() {
+            return this.fmt(this.rmse)
+        }
+    },
 })
