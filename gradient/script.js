@@ -70,7 +70,11 @@ Vue.component('gd-tool', {
     <div class="rmse-value">{{rmseFormatted}}</div>
     </div>
     `,
-    props: ["mode"],
+    props: {
+        mode: {
+            default: "normal"
+        }
+    },
     data() {
         return {
             sourceData: [
@@ -115,6 +119,25 @@ Vue.component('gd-tool', {
             }, 0.0)
 
             this.rmse = sumErrorSquared / (2 * this.sourceData.length)
+        },
+        trainingStep() {
+            let [dJ_dW, dJ_db] = this.sourceData
+                .map(pair => {
+                    const base = (this.predict(pair[0]) - pair[1])
+
+                    return [base * pair[0], base]
+                })
+                .reduce((acc, current) => [acc[0] + current[0], acc[1] + current[1]], [0, 0])
+            
+            dJ_dW = dJ_dW / this.sourceData.length
+            dJ_db = dJ_db / this.sourceData.length
+
+            this.W = this.W - this.slider.value * dJ_dW
+            this.b = this.b - this.slider.value * dJ_db
+
+            this.updateRMSE()
+
+            console.log(this.W, this.b)
         }
     },
     mounted() {
@@ -145,9 +168,11 @@ Vue.component('gd-tool', {
         this.start.constrainToY()
         this.end.constrainToY()
 
-        this.end.addDependency(this.start)
-        this.end.update = () => {
-            this.end.y = this.end.y + this.start.dy
+        if (this.mode == "normal") {
+            this.end.addDependency(this.start)
+            this.end.update = () => {
+                this.end.y = this.end.y + this.start.dy
+            }    
         }
 
         line.addDependency(this.start)
@@ -194,7 +219,7 @@ Vue.component('gd-tool', {
 
         if (this.mode === "training") {
             this.slider = this.interactive.slider(this.interactive.width - 200, -70, {
-                min: 0.001, max: 0.1
+                min: 0.0001, max: 0.01, value: 0.0005,
             })
             let button = this.interactive.button(this.interactive.width - 200, -30, "Train Step")
 
