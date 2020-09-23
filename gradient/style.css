@@ -52,4 +52,6 @@ body {
   }
   .definitions {
     margin: 10px;
+    max-width: 1200px;
+    font-size: 1.1em;
   }

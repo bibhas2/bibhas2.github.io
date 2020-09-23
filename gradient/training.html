@@ -24,75 +24,76 @@
   </div>
 
   <div class="definitions">
-    <h2>DEFINITIONS</h2>
-    <h3>Features</h3>
+    <h2>GRADIENT DESCENT</h2>
     <p>
-      Features are the independent variables in a model. Here the observed temperature is a feature. Foot traffic
-      depends on it. We use the symbol <b>x</b> for labels.
+      Gradient Descent is one of the simplest optimization algorithms. We can use it tro find the optimal values
+      of <b>W</b> and <b>b</b>.
     </p>
-    <h3>Label</h3>
+    <h3>The Algorithm</h3>
     <p>
-      A label is the observed effect. Here the actual foot traffic is the label. We
-      will use the symbol <b>y</b> to represent a label.
-    </p>
-    <h3>Weight</h3>
-    <p>Weight is the slope of the line we fit through the observed data samples. It measures how much
-      effect a feature has on the label. We use the symbol
-      <b>W</b> for it.
-    </p>
-    <h3>Bias</h3>
-    <p>Bias is the y intercept of the line we fit through the data sample. We use the symbol
-      <b>b</b> for it.</p>
-    <h3>Prediction</h3>
-    <p>This is the value of a label predicted by the line we fit through the data samples.
-      We use the symbol <b>y'</b> or <b>y_</b> for it. Prediction is computed using the equation.
+      We start with some random values of <b>W</b> and <b>b</b>. We repeatedly correct their values using
+      these equations.
+
       $$
-      y' = W \times x + b
+      W = W - \alpha \frac{\partial J}{\partial W}
+      $$
+      $$
+      b = b - \alpha \frac{\partial J}{\partial b}
       $$
 
-      The goal of a model is to find the most optimal values of <b>W</b> and <b>b</b> that will give us the
-      highest quality predictions. Sadly we can not use algebra to solve for <b>W</b> and <b>b</b> using a single equation.
-    </p>
-    <h3>Error or Cost</h3>
-    <p>
-      Error measures the accuracy of our predictions or how good a job we have done fitting the line through the observed data samples. We use the
-      symbol <b>J</b> for it. Root Mean
-      Square Error (RMSE) is a very effective and common way to measure the overall error of a model.
-      It is calculated using this equation. Here <b>m</b> is the number of data samples.
+      Where \(\alpha\) is the <b>Learning Rate</b> (LR).
+      </p>
+      <p>
+        With each iteration the error \(J\) should continue to go down. As we reach the minimum value of \(J\) the 
+        corrections to <b>W</b> and <b>b</b> will be smaller and smaller.
+      </p>
+
+      <h3>The Derivatives</h3>
+      <p>
+      We have seen the cost function \(J\) as:
+
 
       $$
       J = \frac{1}{2m} \sum (y - y')^{2}
       $$
-
-      By replacing the value of <b>y'</b> we get.
+      
+      Or,
 
       $$
-      J = \frac{1}{2m} \sum (y - (W \times x + b))^{2}
+      J = \frac{1}{2m} \sum (y^{2} - 2yy' + y'^{2})
       $$
 
-      Here <b>x</b> and <b>y</b> are the observed data points. This makes <b>J</b> solely a function of
-      <b>W</b> and <b>b</b>. This equation is still not enough to solve for <b>W</b> and <b>b</b>.
-    </p>
-    <h3>Optimization</h3>
-    <p>
-      Various algorithms exist in Machine Learning (ML) that can approximately solve for <b>W</b> and <b>b</b>. 
-      They do this by repeatedly trying out different values of <b>W</b> and <b>b</b> until we achieve an acceptable error value.
-      This is called optimization or error minimization.
-    </p>
-    <p>
-      A brute force optimizer can try out random values of <b>W</b> and <b>b</b> or try all
-      possible combinations of them. But that will take immense computational power to solve even
-      the simplest of cases. This is why reserchers have developed optimizers that make educated
-      guesses and very quickly arrive at optimal values of <b>W</b> and <b>b</b>. Commonly used
-      optimizers are:
+      Using the chain rule of derivatives we can write.
 
-      <ul>
-        <li>Gradient Descent</li>
-        <li>Adam</li>
-        <li>Adagrad</li>
-        <li>RMS Prop</li>
-      </ul>
+      $$
+      \frac{\partial J}{\partial W} = \frac{1}{2m} \sum (-2y\frac{\partial y'}{\partial W} + 2y'\frac{\partial y'}{\partial W})
+      $$
+
+      We know:
+      $$
+      y' = W \times x + b
+      $$
+
+      Then:
+
+      $$
+      \frac{\partial y'}{\partial W} = x
+      $$
+
+      Finally we can write:
+
+      $$
+      \frac{\partial J}{\partial W} = \frac{1}{m} \sum (-yx + y'x)
+      $$
+
+      Similarly we can work out:
+
+      $$
+      \frac{\partial J}{\partial b} = \frac{1}{m} \sum (-y + y')
+      $$
+
     </p>
+    
   </div>
 
   <!-- We need to use type="module" and import because
