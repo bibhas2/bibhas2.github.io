@@ -93,6 +93,7 @@ Vue.component('gd-tool', {
             xform: undefined,
             transformedData: undefined,
             numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
+            lrFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 5 }),
             W: 0,
             b: 0,
             rmse: 0,
@@ -147,12 +148,18 @@ Vue.component('gd-tool', {
 
             let coord = this.xform.toSVG([0, this.b])
             this.start.y = coord[1]
-            this.end.y = this.start.y - this.W * (this.end.x - this.start.x)
+
+            let startVal = this.xform.fromSVG([this.start.x, this.start.y])
+            let endVal = this.xform.fromSVG([this.end.x, this.end.y])
+            //Update end value y
+            endVal[1] = startVal[1] + this.W * (endVal[0] - startVal[0])
+            coord = this.xform.toSVG(endVal)
+
+            this.end.y = coord[1]
+
             this.bValue.update()
             this.wValue.update()
             this.line.update()
-
-            console.log(this.W, this.b, coord[1])
         }
     },
     mounted() {
@@ -234,8 +241,14 @@ Vue.component('gd-tool', {
 
         if (this.mode === "training") {
             this.slider = this.interactive.slider(this.interactive.width - 200, -70, {
-                min: 0.0001, max: 0.01, value: 0.0005,
+                min: 0.00001, max: 0.0005, value: 0.0005,
             })
+            let lr = this.interactive.text(this.interactive.width - 190, -90, `LR: ${this.lrFormatter.format(this.slider.value)}`)
+            lr.addDependency(this.slider)
+            lr.update = () => {
+                lr.contents = `LR: ${this.lrFormatter.format(this.slider.value)}`
+            }
+
             let button = this.interactive.button(this.interactive.width - 200, -30, "Train Step")
 
             button.onclick = () => {
