@@ -48,28 +48,62 @@ class Transformer {
     }
 }
 
-var app = new Vue({
-    el: '.data-table',
-    data: {
-        sourceData: [
-            [30, 6.5],
-            [40, 9],
-            [45, 9],
-            [50, 9.6],
-            [60, 10],
-            [65, 11.5],
-            [70, 12.],
-            [75, 12.5],
-            [80, 14.75]
-        ],
-        margin: 40,
-        interactive: undefined,
-        xform: undefined,
-        transformedData: undefined,
-        numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
-        W: 0,
-        b: 0,
-        rmse: 0,
+Vue.component('gd-tool', {
+    template: `
+    <div class="data-table">
+    <div class="table-description">
+      Correlation of Foot Traffic (Customers/hour) with Temperature.
+    </div>
+    <div class="table-header">Temperature<br />(x)</div>
+    <div class="table-header">Actual<br />Foot Traffic<br />(y)</div>
+    <div class="table-header">Predicted<br />Foot Traffic<br />(y')</div>
+    <div class="table-header">Error<br/>(y - y')</div>
+    <template v-for="sample in sourceData">
+      <div class="data-cell">{{fmt(sample[0])}}</div>
+      <div class="data-cell">{{fmt(sample[1])}}</div>
+      <div class="data-cell">{{fmt(predict(sample[0]))}}</div>
+      <div class="data-cell">{{fmt(error(sample[0], sample[1]))}}</div>
+    </template>
+    <div class="rmse-label">
+      Root Mean Square Error (RMSE)
+    </div>
+    <div class="rmse-value">{{rmseFormatted}}</div>
+    </div>
+    `,
+    props: {
+        mode: {
+            default: "normal"
+        }
+    },
+    data() {
+        return {
+            sourceData: [
+                [30, 6.5],
+                [40, 9],
+                [45, 9],
+                [50, 9.6],
+                [60, 10],
+                [65, 11.5],
+                [70, 12.],
+                [75, 12.5],
+                [80, 14.75]
+            ],
+            margin: 40,
+            interactive: undefined,
+            xform: undefined,
+            transformedData: undefined,
+            numFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 3 }),
+            lrFormatter: new Intl.NumberFormat(undefined, { maximumFractionDigits: 5 }),
+            W: 0,
+            b: 0,
+            rmse: 0,
+            line: undefined,
+            start: undefined,
+            bValue: undefined,
+            wValue: undefined,
+            end: undefined,
+            slider: undefined,
+        }
     },
     methods: {
         predict(temp) {
@@ -89,11 +123,43 @@ var app = new Vue({
             }, 0.0)
 
             this.rmse = sumErrorSquared / (2 * this.sourceData.length)
-        }
-    },
-    computed: {
-        rmseFormatted() {
-            return this.fmt(this.rmse)
+        },
+        trainingStep() {
+            for (let i = 0; i < 5000; ++i) {
+                let [dJ_dW, dJ_db] = this.sourceData
+                    .map(pair => {
+                        const base = (this.predict(pair[0]) - pair[1])
+
+                        return [base * pair[0], base]
+                    })
+                    .reduce((acc, current) => [acc[0] + current[0], acc[1] + current[1]], [0, 0])
+
+                dJ_dW = dJ_dW / this.sourceData.length
+                dJ_db = dJ_db / this.sourceData.length
+
+                this.W = this.W - this.slider.value * dJ_dW
+                this.b = this.b - this.slider.value * dJ_db
+
+                // let coord = this.xform.toSVG([0, this.b])
+                // this.start.y = coord[1]
+                // this.start.y = -100
+            }
+            this.updateRMSE()
+
+            let coord = this.xform.toSVG([0, this.b])
+            this.start.y = coord[1]
+
+            let startVal = this.xform.fromSVG([this.start.x, this.start.y])
+            let endVal = this.xform.fromSVG([this.end.x, this.end.y])
+            //Update end value y
+            endVal[1] = startVal[1] + this.W * (endVal[0] - startVal[0])
+            coord = this.xform.toSVG(endVal)
+
+            this.end.y = coord[1]
+
+            this.bValue.update()
+            this.wValue.update()
+            this.line.update()
         }
     },
     mounted() {
@@ -107,11 +173,11 @@ var app = new Vue({
         this.transformedData = this.xform.setup(this.sourceData)
 
         let coord = this.xform.toSVG([0, this.xform.ymin])
-        let start = this.interactive.control(coord[0], coord[1])
+        this.start = this.interactive.control(coord[0], coord[1])
 
         coord = this.xform.toSVG([0, this.xform.ymax])
-        let end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
-        let line = this.interactive.line(start.x, start.y, end.x, end.y)
+        this.end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
+        this.line = this.interactive.line(this.start.x, this.start.y, this.end.x, this.end.y)
 
         let xAxis = this.interactive.line(0, 0, this.interactive.width - this.margin, 0);
         let yAxis = this.interactive.line(0, 0, 0, -this.interactive.height + this.margin);
@@ -121,44 +187,46 @@ var app = new Vue({
         xAxis.setAttribute('marker-end', `url(#${marker.id})`);
         yAxis.setAttribute('marker-end', `url(#${marker.id})`);
 
-        start.constrainToY()
-        end.constrainToY()
+        this.start.constrainToY()
+        this.end.constrainToY()
 
-        end.addDependency(start)
-        end.update = function () {
-            end.y = end.y + start.dy
+        /*
+            this.end.addDependency(this.start)
+            this.end.update = () => {
+                this.end.y = this.end.y + this.start.dy
+            }    
+        */
+
+        this.line.addDependency(this.start)
+        this.line.addDependency(this.end)
+        this.line.update = () => {
+            this.line.x1 = this.start.x;
+            this.line.y1 = this.start.y;
+            this.line.x2 = this.end.x;
+            this.line.y2 = this.end.y;
         }
 
-        line.addDependency(start)
-        line.addDependency(end)
-        line.update = () => {
-            line.x1 = start.x;
-            line.y1 = start.y;
-            line.x2 = end.x;
-            line.y2 = end.y;
-        }
-
-        coord = this.xform.fromSVG([0, start.y])
+        coord = this.xform.fromSVG([0, this.start.y])
         this.b = coord[1]
-        let bValue = this.interactive.text(start.x + 10, start.y + 10, `b: ${this.fmt(this.b)}`)
-        bValue.addDependency(start)
-        bValue.update = () => {
-            bValue.y += start.dy
+        this.bValue = this.interactive.text(this.start.x + 10, this.start.y + 10, `b: ${this.fmt(this.b)}`)
+        this.bValue.addDependency(this.start)
+        this.bValue.update = () => {
+            this.bValue.y += this.start.dy
 
-            let pair = this.xform.fromSVG([0, start.y])
+            let pair = this.xform.fromSVG([0, this.start.y])
             this.b = pair[1]
-            bValue.contents = `b: ${this.fmt(this.b)}`
+            this.bValue.contents = `b: ${this.fmt(this.b)}`
 
             this.updateRMSE()
         }
 
-        this.W = this.xform.getSlope(start, end)
-        let wValue = this.interactive.text(end.x - 80, end.y - 10, `W: ${this.fmt(this.W)}`)
-        wValue.addDependency(end)
-        wValue.update = () => {
-            wValue.y += end.dy
-            this.W = this.xform.getSlope(start, end)
-            wValue.contents = `W: ${this.fmt(this.W)}`
+        this.W = this.xform.getSlope(this.start, this.end)
+        this.wValue = this.interactive.text(this.end.x - 80, this.end.y - 10, `W: ${this.fmt(this.W)}`)
+        this.wValue.addDependency(this.end)
+        this.wValue.update = () => {
+            this.wValue.y += this.end.dy
+            this.W = this.xform.getSlope(this.start, this.end)
+            this.wValue.contents = `W: ${this.fmt(this.W)}`
 
             this.updateRMSE()
         }
@@ -171,6 +239,27 @@ var app = new Vue({
         xLabel.setAttribute('transform', `rotate(${-90})`)
         let yLabel = this.interactive.text(200, 20, "Temperature (F)")
 
+        if (this.mode === "training") {
+            this.slider = this.interactive.slider(this.interactive.width - 200, -70, {
+                min: 0.00001, max: 0.0005, value: 0.0005,
+            })
+            let lr = this.interactive.text(this.interactive.width - 190, -90, `LR: ${this.lrFormatter.format(this.slider.value)}`)
+            lr.addDependency(this.slider)
+            lr.update = () => {
+                lr.contents = `LR: ${this.lrFormatter.format(this.slider.value)}`
+            }
+
+            let button = this.interactive.button(this.interactive.width - 200, -30, "Train Step")
+
+            button.onclick = () => {
+                this.trainingStep()
+            }
+        }
         this.updateRMSE()
-    }
+    },
+    computed: {
+        rmseFormatted() {
+            return this.fmt(this.rmse)
+        }
+    },
 })

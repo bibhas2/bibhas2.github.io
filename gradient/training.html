@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Training</title>
+  <link rel="stylesheet" href="https://vectorjs.org/library.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+
+<body>
+  <div class="app-container">
+    <div id="my-interactive"></div>
+    <div class="app">
+      <gd-tool mode="training"></gd-tool>
+    </div>
+
+  </div>
+
+  <div class="definitions">
+    <h2>GRADIENT DESCENT</h2>
+    <p>
+      Gradient Descent is one of the simplest optimization algorithms. We can use it tro find the optimal values
+      of <b>W</b> and <b>b</b>.
+    </p>
+    <h3>The Algorithm</h3>
+    <p>
+      We start with some random values of <b>W</b> and <b>b</b>. We repeatedly correct their values using
+      these equations.
+
+      $$
+      W = W - \alpha \frac{\partial J}{\partial W}
+      $$
+      $$
+      b = b - \alpha \frac{\partial J}{\partial b}
+      $$
+
+      Where \(\alpha\) is the <b>Learning Rate</b> (LR).
+      </p>
+      <p>
+        With each iteration the error \(J\) should continue to go down. As we reach the minimum value of \(J\) the 
+        corrections to <b>W</b> and <b>b</b> will be smaller and smaller.
+      </p>
+
+      <h3>The Derivatives</h3>
+      <p>
+      We have seen the cost function \(J\) as:
+
+
+      $$
+      J = \frac{1}{2m} \sum (y - y')^{2}
+      $$
+      
+      Or,
+
+      $$
+      J = \frac{1}{2m} \sum (y^{2} - 2yy' + y'^{2})
+      $$
+
+      Using the chain rule of derivatives we can write.
+
+      $$
+      \frac{\partial J}{\partial W} = \frac{1}{2m} \sum (-2y\frac{\partial y'}{\partial W} + 2y'\frac{\partial y'}{\partial W})
+      $$
+
+      We know:
+      $$
+      y' = W \times x + b
+      $$
+
+      Then:
+
+      $$
+      \frac{\partial y'}{\partial W} = x
+      $$
+
+      Finally we can write:
+
+      $$
+      \frac{\partial J}{\partial W} = \frac{1}{m} \sum (-yx + y'x)
+      $$
+
+      Similarly we can work out:
+
+      $$
+      \frac{\partial J}{\partial b} = \frac{1}{m} \sum (-y + y')
+      $$
+
+    </p>
+    
+  </div>
+
+  <!-- We need to use type="module" and import because
+  in script.js we import: import Interactive. Otherwise scripts are
+  getting loaded out of order.-->
+  <script type="module">
+  import './script.js'
+
+  var app = new Vue({
+      el: '.app',
+  })
+  </script>
+
+</body>
+
+</html>
