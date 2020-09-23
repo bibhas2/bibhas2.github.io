@@ -47,7 +47,7 @@ class Transformer {
         return (endData[1] - startData[1]) / (endData[0] - startData[0])
     }
 }
-console.log("Declaring component")
+
 Vue.component('gd-tool', {
     template: `
     <div class="data-table">

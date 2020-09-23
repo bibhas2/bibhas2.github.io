@@ -7,66 +7,11 @@
   <title>Gradient Descent</title>
   <link rel="stylesheet" href="https://vectorjs.org/library.css">
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    #my-interactive {
-      width: 600px;
-      height: 400px;
-    }
-
-    .app-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      max-width: 1200px;
-    }
-
-    .data-table {
-      display: grid;
-      grid-template-columns: auto auto auto auto;
-      max-width: 510px;
-      margin-left: 50px;
-    }
-
-    .table-description {
-      grid-column: span 4;
-    }
-
-    .table-header {
-      background-color: black;
-      color: white;
-      text-align: center;
-      font-weight: bold;
-      padding-top: 7px;
-      margin-bottom: 5px;
-    }
-
-    .data-cell {
-      padding-left: 10px;
-    }
-
-    .rmse-label {
-      grid-column: span 3;
-      border-top: thin gray solid;
-      padding-top: 10px;
-      padding-left: 10px;
-    }
-
-    .rmse-value {
-      border-top: thin gray solid;
-      padding-top: 10px;
-      padding-left: 10px;
-    }
-    .definitions {
-      margin: 10px;
-    }
-  </style>
   
-  <script type="module" src="script.js"></script>
-
+  <link rel="stylesheet" href="style.css">
+  
 </head>
 
 <body>
@@ -107,7 +52,7 @@
       $$
 
       The goal of a model is to find the most optimal values of <b>W</b> and <b>b</b> that will give us the
-      highest quality predictions. Sadly we can not use algebra to solve the equation for <b>W</b> and <b>b</b>.
+      highest quality predictions. Sadly we can not use algebra to solve for <b>W</b> and <b>b</b> using a single equation.
     </p>
     <h3>Error or Cost</h3>
     <p>
@@ -135,10 +80,28 @@
       They do this by repeatedly trying out different values of <b>W</b> and <b>b</b> until we achieve an acceptable error value.
       This is called optimization or error minimization.
     </p>
+    <p>
+      A brute force optimizer can try out random values of <b>W</b> and <b>b</b> or try all
+      possible combinations of them. But that will take immense computational power to solve even
+      the simplest of cases. This is why reserchers have developed optimizers that make educated
+      guesses and very quickly arrive at optimal values of <b>W</b> and <b>b</b>. Commonly used
+      optimizers are:
+
+      <ul>
+        <li>Gradient Descent</li>
+        <li>Adam</li>
+        <li>Adagrad</li>
+        <li>RMS Prop</li>
+      </ul>
+    </p>
   </div>
 
-  <script>
-  console.log("Declaring app")
+  <!-- We need to use type="module" and import because
+  in script.js we import: import Interactive. Otherwise scripts are
+  getting loaded out of order.-->
+  <script type="module">
+  import './script.js'
+
   var app = new Vue({
       el: '.app',
   })
