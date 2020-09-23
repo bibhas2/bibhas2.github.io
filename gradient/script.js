@@ -70,6 +70,7 @@ Vue.component('gd-tool', {
     <div class="rmse-value">{{rmseFormatted}}</div>
     </div>
     `,
+    props: ["mode"],
     data() {
         return {
             sourceData: [
@@ -91,6 +92,9 @@ Vue.component('gd-tool', {
             W: 0,
             b: 0,
             rmse: 0,
+            start: undefined,
+            end: undefined,
+            slider: undefined,
         }
     },
     methods: {
@@ -124,11 +128,11 @@ Vue.component('gd-tool', {
         this.transformedData = this.xform.setup(this.sourceData)
 
         let coord = this.xform.toSVG([0, this.xform.ymin])
-        let start = this.interactive.control(coord[0], coord[1])
+        this.start = this.interactive.control(coord[0], coord[1])
 
         coord = this.xform.toSVG([0, this.xform.ymax])
-        let end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
-        let line = this.interactive.line(start.x, start.y, end.x, end.y)
+        this.end = this.interactive.control(this.interactive.width - 2 * this.margin, coord[1])
+        let line = this.interactive.line(this.start.x, this.start.y, this.end.x, this.end.y)
 
         let xAxis = this.interactive.line(0, 0, this.interactive.width - this.margin, 0);
         let yAxis = this.interactive.line(0, 0, 0, -this.interactive.height + this.margin);
@@ -138,43 +142,43 @@ Vue.component('gd-tool', {
         xAxis.setAttribute('marker-end', `url(#${marker.id})`);
         yAxis.setAttribute('marker-end', `url(#${marker.id})`);
 
-        start.constrainToY()
-        end.constrainToY()
+        this.start.constrainToY()
+        this.end.constrainToY()
 
-        end.addDependency(start)
-        end.update = function () {
-            end.y = end.y + start.dy
+        this.end.addDependency(this.start)
+        this.end.update = () => {
+            this.end.y = this.end.y + this.start.dy
         }
 
-        line.addDependency(start)
-        line.addDependency(end)
+        line.addDependency(this.start)
+        line.addDependency(this.end)
         line.update = () => {
-            line.x1 = start.x;
-            line.y1 = start.y;
-            line.x2 = end.x;
-            line.y2 = end.y;
+            line.x1 = this.start.x;
+            line.y1 = this.start.y;
+            line.x2 = this.end.x;
+            line.y2 = this.end.y;
         }
 
-        coord = this.xform.fromSVG([0, start.y])
+        coord = this.xform.fromSVG([0, this.start.y])
         this.b = coord[1]
-        let bValue = this.interactive.text(start.x + 10, start.y + 10, `b: ${this.fmt(this.b)}`)
-        bValue.addDependency(start)
+        let bValue = this.interactive.text(this.start.x + 10, this.start.y + 10, `b: ${this.fmt(this.b)}`)
+        bValue.addDependency(this.start)
         bValue.update = () => {
-            bValue.y += start.dy
+            bValue.y += this.start.dy
 
-            let pair = this.xform.fromSVG([0, start.y])
+            let pair = this.xform.fromSVG([0, this.start.y])
             this.b = pair[1]
             bValue.contents = `b: ${this.fmt(this.b)}`
 
             this.updateRMSE()
         }
 
-        this.W = this.xform.getSlope(start, end)
-        let wValue = this.interactive.text(end.x - 80, end.y - 10, `W: ${this.fmt(this.W)}`)
-        wValue.addDependency(end)
+        this.W = this.xform.getSlope(this.start, this.end)
+        let wValue = this.interactive.text(this.end.x - 80, this.end.y - 10, `W: ${this.fmt(this.W)}`)
+        wValue.addDependency(this.end)
         wValue.update = () => {
-            wValue.y += end.dy
-            this.W = this.xform.getSlope(start, end)
+            wValue.y += this.end.dy
+            this.W = this.xform.getSlope(this.start, this.end)
             wValue.contents = `W: ${this.fmt(this.W)}`
 
             this.updateRMSE()
@@ -188,6 +192,16 @@ Vue.component('gd-tool', {
         xLabel.setAttribute('transform', `rotate(${-90})`)
         let yLabel = this.interactive.text(200, 20, "Temperature (F)")
 
+        if (this.mode === "training") {
+            this.slider = this.interactive.slider(this.interactive.width - 200, -70, {
+                min: 0.001, max: 0.1
+            })
+            let button = this.interactive.button(this.interactive.width - 200, -30, "Train Step")
+
+            button.onclick = () => {
+                this.trainingStep()
+            }
+        }
         this.updateRMSE()
     },
     computed: {
