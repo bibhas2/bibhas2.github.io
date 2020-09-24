@@ -1,4 +1,7 @@
 img.page {
-    width: 100%;
+    max-width: 100%;
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
     /* height: 100%; */
 }

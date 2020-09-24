@@ -1,7 +1,7 @@
 Vue.component("book", {
     template: `
 <div>
-    <img :src="currentFile" class="page" @click="navigate($event)"/>
+    <img :src="currentFile" class="page" @click="navigateOnClick($event)"/>
     <link rel="prefetch" :href="prefetchFile">
 </div>
     `,
@@ -32,6 +32,11 @@ Vue.component("book", {
 
             this.onChangePage()
         }
+
+        window.addEventListener('keyup', this.navigateOnKey)
+    },
+    beforeDestroy() {
+        window.removeEventListener('keyup', this.navigateOnKey);
     },
     methods: {
         next() {
@@ -48,12 +53,19 @@ Vue.component("book", {
 
             this.onChangePage()
         },
-        navigate(e) {
+        navigateOnClick(e) {
             let rect = e.target.getBoundingClientRect();
 
             if (e.clientX > rect.left + rect.width / 2.0) {
                 this.next()
             } else {
+                this.prev()
+            }
+        },
+        navigateOnKey(e) {
+            if (e.key === "ArrowRight") {
+                this.next()
+            } else if (e.key === "ArrowLeft") {
                 this.prev()
             }
         },
