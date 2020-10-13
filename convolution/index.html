@@ -125,25 +125,35 @@
           return v
         },
         convolve() {
+          //Step 1: Slide the kernel
+
           if (this.kernelX == undefined) {
             //We are just starting
             this.kernelX = 0
             this.kernelY = 0
           } else if ((this.kernelX + this.kernelCols) == this.numCols && (this.kernelY + this.kernelRows) == this.numRows) {
+            //Reached end
             return
           } else {
             this.kernelX += 1
 
             if ((this.kernelX + this.kernelCols) > this.numCols) {
-              //We have finished one row
+              //We have finished one row. Go to the next.
               this.kernelX = 0
               this.kernelY += 1
             }
-
-            if ((this.kernelY + this.kernelRows) > this.numRows) {
-              this.kernelY = this.numRows - this.kernelRows
-            }
           }
+
+          //Step 2: Do convolution
+          let sum = 0
+
+          for (let row = 0; row < this.kernelRows; ++row) {
+            for (let col = 0; col < this.kernelCols; ++col) {
+              sum = sum + this.kernel[row][col] * this.matrix[this.kernelY + row][this.kernelX + col]
+            }
+          } 
+
+          this.output[this.kernelY][this.kernelX] = sum
         }
       },
       mounted() {
