@@ -9,7 +9,10 @@
 
   <style>
     svg {
-      width: 400px;
+      width: 300px;
+    }
+    .matrix-grid {
+      display: grid;
     }
   </style>
 </head>
@@ -17,10 +20,10 @@
 <body>
   <div class="app-container">
     <div class="app">
-      <div class="matrix">
+      <div class="matrix-grid">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <template v-for="row in matrix.length">
-            <template v-for="col in matrix[0].length">
+          <template v-for="row in numRows">
+            <template v-for="col in numCols">
               <rect :x="(col - 1) * boxWidth" :y="(row - 1) * boxWidth" :width="boxWidth" :height="boxWidth"
                 style="fill: none; stroke: rgb(0, 0, 0);" />
               <text
@@ -28,6 +31,9 @@
                 :x="(col - 1) * boxWidth + 10" :y="(row - 1) * boxWidth + 25">{{matrix[row-1][col-1]}}</text>
             </template>
           </template>
+
+          <rect :x="kernelX * boxWidth" :y="kernelY * boxWidth" :width="boxWidth * kernelCols" :height="boxWidth * kernelRows" style="fill: rgba(158, 230, 251, 0.65);"></rect>
+
         </svg>
       </div>
     </div>
@@ -50,7 +56,9 @@
           [1, 0, 0],
           [0, 1, 0],
           [0, 0, 1],
-        ]
+        ],
+        kernelX: 0,
+        kernelY: 0,
       },
       computed: {
         numRows() {
@@ -58,6 +66,15 @@
         },
         numCols() {
           return this.matrix[0].length
+        },
+        kernelRows() {
+          return this.kernel.length
+        },
+        kernelCols() {
+          return this.kernel[0].length
+        },
+        viewBox() {
+          return "0 0 250 250"
         }
       }
     })
