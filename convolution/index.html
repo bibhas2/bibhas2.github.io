@@ -8,12 +8,20 @@
   <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 
   <style>
-
-
     .matrix-grid {
       display: grid;
       grid-template-columns: 300px 200px 200px;
       gap: 20px;
+    }
+    button {
+      background-color: rgb(0, 0, 0);
+      height: 35px;
+      width: 120px;
+      color: white;
+      font-size: 1.1em;
+    }
+    button:active {
+      background-color: rgb(241, 131, 91);
     }
   </style>
 </head>
@@ -34,8 +42,9 @@
               </template>
             </template>
 
-            <rect :x="kernelX * boxWidth" :y="kernelY * boxWidth" :width="boxWidth * kernelCols"
-              :height="boxWidth * kernelRows" style="fill: rgba(158, 230, 251, 0.65);"></rect>
+            <rect v-if="kernelX !== undefined" :x="kernelX * boxWidth" :y="kernelY * boxWidth"
+              :width="boxWidth * kernelCols" :height="boxWidth * kernelRows" style="fill: rgba(158, 230, 251, 0.65);">
+            </rect>
 
           </svg>
           <p>Matrix</p>
@@ -70,6 +79,10 @@
         </div>
 
       </div>
+      <div>
+        <button>Convolve</button>
+        <button>Reset</button>
+      </div>
     </div>
   </div>
 
@@ -92,8 +105,8 @@
           [0, 1, 0],
           [0, 0, 1],
         ],
-        kernelX: 0,
-        kernelY: 0,
+        kernelX: undefined,
+        kernelY: undefined,
       },
       methods: {
         resetOutput() {
@@ -105,7 +118,7 @@
             return ''
           }
 
-          let v =  this.output[r][c] !== undefined ? this.output[r][c] : ''
+          let v = this.output[r][c] !== undefined ? this.output[r][c] : ''
 
           return v
         }
