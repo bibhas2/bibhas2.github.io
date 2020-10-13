@@ -14,7 +14,7 @@
     }
     .matrix-grid {
       display: grid;
-      grid-template-columns: 300px 200px 200px;
+      grid-template-columns: 360px 200px 240px;
       gap: 20px;
     }
     button {
@@ -38,7 +38,7 @@
       <div class="matrix-grid">
         <div>
           <h3>Matrix</h3>
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
             <template v-for="row in numRows">
               <template v-for="col in numCols">
                 <rect :x="(col - 1) * boxWidth" :y="(row - 1) * boxWidth" :width="boxWidth" :height="boxWidth"
@@ -71,7 +71,7 @@
         </div>
         <div>
           <h3>Output</h3>
-          <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
             <template v-for="row in outputRows">
               <template v-for="col in outputCols">
                 <rect :x="(col - 1) * boxWidth" :y="(row - 1) * boxWidth" :width="boxWidth" :height="boxWidth"
@@ -102,11 +102,12 @@
         boxWidth: 40,
         sumSteps: '',
         matrix: [
-          [1, 2, 3, 4, 5],
-          [6, 7, 8, 9, 10],
-          [11, 12, 13, 14, 15],
-          [16, 17, 18, 19, 20],
-          [21, 22, 23, 24, 25]
+          [1, 2, 3, 4, 5, 6],
+          [7, 8, 9, 10, 11, 12],
+          [13, 14, 15, 16, 17, 18],
+          [19, 20, 21, 22, 23, 24],
+          [25, 26, 27, 28, 29, 30],
+          [31, 32, 33, 34, 35, 36]
         ],
         kernel: [
           [1, 0, 0],
@@ -165,16 +166,18 @@
           this.sumSteps = ''
 
           for (let row = 0; row < this.kernelRows; ++row) {
+            if (row > 0) {
+              this.sumSteps += ' + <br/>'
+            }
             for (let col = 0; col < this.kernelCols; ++col) {
               sum = sum + this.kernel[row][col] * this.matrix[this.kernelY + row][this.kernelX + col]
 
-              if (this.sumSteps.length > 0) {
+              if (col > 0) {
                 this.sumSteps += ' + '
               }
-
+              
               this.sumSteps += `${this.matrix[this.kernelY + row][this.kernelX + col]} × ${this.kernel[row][col]}`
             }
-            this.sumSteps += '<br/>'
           } 
 
           this.output[this.kernelY][this.kernelX] = sum
