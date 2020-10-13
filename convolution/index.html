@@ -54,10 +54,10 @@
             <template v-for="row in kernelRows">
               <template v-for="col in kernelCols">
                 <rect :x="(col - 1) * boxWidth" :y="(row - 1) * boxWidth" :width="boxWidth" :height="boxWidth"
-                  style="fill: none; stroke: rgb(0, 0, 0);" />
+                  style="fill: rgba(158, 230, 251); stroke: rgb(0, 0, 0);" />
                 <text
                   style="fill: rgb(51, 51, 51); font-family: &quot;Helvetica&quot;; font-size: 14px; white-space: pre;"
-                  :x="(col - 1) * boxWidth + 10" :y="(row - 1) * boxWidth + 25">{{kernel[row-1][col-1]}}</text>
+                  :x="(col - 1) * boxWidth + 15" :y="(row - 1) * boxWidth + 25">{{kernel[row-1][col-1]}}</text>
               </template>
             </template>
           </svg>
@@ -80,8 +80,8 @@
 
       </div>
       <div>
-        <button>Convolve</button>
-        <button>Reset</button>
+        <button @click="convolve()">Convolve</button>
+        <button @click="resetOutput()">Reset</button>
       </div>
     </div>
   </div>
@@ -110,8 +110,10 @@
       },
       methods: {
         resetOutput() {
-          this.output = new Array(this.outputRows)
-          this.output.forEach((_, index) => this.output[index] = new Array(this.outputCols))
+          this.kernelX = undefined
+          this.kernelY = undefined
+          this.output = new Array(this.outputRows).fill(undefined)
+          this.output.forEach((_, index) => this.output[index] = new Array(this.outputCols).fill(undefined))
         },
         outputDisplay(r, c) {
           if (this.output == undefined) {
@@ -121,6 +123,27 @@
           let v = this.output[r][c] !== undefined ? this.output[r][c] : ''
 
           return v
+        },
+        convolve() {
+          if (this.kernelX == undefined) {
+            //We are just starting
+            this.kernelX = 0
+            this.kernelY = 0
+          } else if ((this.kernelX + this.kernelCols) == this.numCols && (this.kernelY + this.kernelRows) == this.numRows) {
+            return
+          } else {
+            this.kernelX += 1
+
+            if ((this.kernelX + this.kernelCols) > this.numCols) {
+              //We have finished one row
+              this.kernelX = 0
+              this.kernelY += 1
+            }
+
+            if ((this.kernelY + this.kernelRows) > this.numRows) {
+              this.kernelY = this.numRows - this.kernelRows
+            }
+          }
         }
       },
       mounted() {
