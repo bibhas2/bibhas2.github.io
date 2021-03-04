@@ -131,8 +131,8 @@
       </g>
       <g class="com.sun.star.drawing.TextShape">
        <g id="id8">
-        <rect class="BoundingBox" stroke="none" fill="none" x="408" y="5733" width="4573" height="807"/>
-        <text class="TextShape"><tspan class="TextParagraph" font-family="Liberation Sans, sans-serif" font-size="494px" font-weight="400"><tspan class="TextPosition" x="658" y="6307"><tspan fill="rgb(0,0,0)" stroke="none">Rooms</tspan></tspan></tspan></text>
+        <rect class="BoundingBox" stroke="none" fill="none" x="108" y="5733" width="4573" height="807"/>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="Liberation Sans, sans-serif" font-size="494px" font-weight="400"><tspan class="TextPosition" x="358" y="6307"><tspan fill="rgb(0,0,0)" stroke="none">Rooms</tspan></tspan></tspan></text>
        </g>
       </g>
       <g class="Graphic">
