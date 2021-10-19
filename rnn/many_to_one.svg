@@ -40,11 +40,12 @@
    <glyph unicode="." horiz-adv-x="241" d="M 175,218 L 384,218 384,0 175,0 Z"/>
    <glyph unicode="," horiz-adv-x="241" d="M 170,-209 C 216,-201 248,-169 267,-112 277,-82 282,-53 282,-25 282,-20 282,-16 282,-13 281,-9 280,-5 279,0 L 170,0 170,218 384,218 384,16 C 384,-63 368,-133 336,-193 304,-253 249,-290 170,-304 Z"/>
    <glyph unicode="+" horiz-adv-x="1061" d="M 92,438 L 92,606 528,606 528,1045 699,1045 699,606 1135,606 1135,438 699,438 699,0 528,0 528,438 Z"/>
+   <glyph unicode="&apos;" horiz-adv-x="201" d="M 338,1469 L 305,881 189,881 156,1469 Z"/>
    <glyph unicode=" " horiz-adv-x="560"/>
   </font>
  </defs>
  <defs class="TextShapeIndex">
-  <g ooo:slide="id1" ooo:id-list="id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13 id14 id15 id16 id17 id18 id19 id20 id21 id22 id23 id24 id25"/>
+  <g ooo:slide="id1" ooo:id-list="id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13 id14 id15 id16 id17 id18 id19 id20 id21 id22 id23 id24 id25 id26 id27 id28"/>
  </defs>
  <defs class="EmbeddedBulletChars">
   <g id="bullet-char-template-57356" transform="scale(0.00048828125,-0.00048828125)">
@@ -244,6 +245,25 @@
         <rect class="BoundingBox" stroke="none" fill="none" x="16972" y="1439" width="1713" height="302"/>
         <path fill="none" stroke="rgb(0,0,0)" d="M 16973,1566 L 18404,1590"/>
         <path fill="rgb(0,0,0)" stroke="none" d="M 18387,1440 L 18684,1595 18382,1740 18387,1440 Z"/>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.OpenBezierShape">
+       <g id="id26">
+        <rect class="BoundingBox" stroke="none" fill="none" x="1169" y="2752" width="2340" height="1061"/>
+        <path fill="none" stroke="rgb(204,204,204)" d="M 1170,2779 C 2501,4822 3182,3270 3413,2866"/>
+        <path fill="rgb(204,204,204)" stroke="none" d="M 3284,2838 L 3474,2753 3507,2958 3284,2838 Z"/>
+       </g>
+      </g>
+      <g class="TextShape">
+       <g id="id27">
+        <rect class="BoundingBox" stroke="none" fill="none" x="1850" y="3149" width="1170" height="881"/>
+        <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Helvetica, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="2316" y="3600"><tspan fill="rgb(204,204,204)" stroke="none">a</tspan></tspan></tspan></text>
+       </g>
+      </g>
+      <g class="TextShape">
+       <g id="id28">
+        <rect class="BoundingBox" stroke="none" fill="none" x="551" y="2149" width="1170" height="881"/>
+        <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Helvetica, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="871" y="2600"><tspan fill="rgb(204,204,204)" stroke="none">0&apos;s</tspan></tspan></tspan></text>
        </g>
       </g>
      </g>
