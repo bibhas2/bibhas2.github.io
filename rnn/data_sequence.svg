@@ -44,7 +44,7 @@
   </font>
  </defs>
  <defs class="TextShapeIndex">
-  <g ooo:slide="id1" ooo:id-list="id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13 id14 id15 id16 id17 id18 id19 id20 id21 id22 id23 id24"/>
+  <g ooo:slide="id1" ooo:id-list="id3 id4 id5 id6 id7 id8 id9 id10 id11 id12 id13 id14 id15 id16 id17 id18 id19 id20 id21 id22 id23 id24 id25 id26 id27 id28"/>
  </defs>
  <defs class="EmbeddedBulletChars">
   <g id="bullet-char-template-57356" transform="scale(0.00048828125,-0.00048828125)">
@@ -241,6 +241,32 @@
        <g id="id24">
         <rect class="BoundingBox" stroke="none" fill="none" x="8374" y="1105" width="3041" height="881"/>
         <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Helvetica, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="9177" y="1556"><tspan fill="rgb(0,0,0)" stroke="none">Discard</tspan></tspan></tspan></text>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.OpenBezierShape">
+       <g id="id25">
+        <rect class="BoundingBox" stroke="none" fill="none" x="6652" y="6087" width="2340" height="1060"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 6653,6114 C 7984,8156 8665,6605 8896,6201"/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 8767,6172 L 8957,6087 8991,6293 8767,6172 Z"/>
+       </g>
+      </g>
+      <g class="TextShape">
+       <g id="id26">
+        <rect class="BoundingBox" stroke="none" fill="none" x="7349" y="6549" width="1170" height="881"/>
+        <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Helvetica, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="7815" y="7000"><tspan fill="rgb(0,0,0)" stroke="none">a</tspan></tspan></tspan></text>
+       </g>
+      </g>
+      <g class="com.sun.star.drawing.OpenBezierShape">
+       <g id="id27">
+        <rect class="BoundingBox" stroke="none" fill="none" x="10869" y="6087" width="2340" height="1060"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 10870,6114 C 12201,8156 12882,6605 13113,6201"/>
+        <path fill="rgb(0,0,0)" stroke="none" d="M 12984,6172 L 13174,6087 13208,6293 12984,6172 Z"/>
+       </g>
+      </g>
+      <g class="TextShape">
+       <g id="id28">
+        <rect class="BoundingBox" stroke="none" fill="none" x="11566" y="6549" width="1170" height="881"/>
+        <text class="SVGTextShape"><tspan class="TextParagraph" font-family="Helvetica, sans-serif" font-size="423px" font-weight="400"><tspan class="TextPosition" x="12032" y="7000"><tspan fill="rgb(0,0,0)" stroke="none">a</tspan></tspan></tspan></text>
        </g>
       </g>
      </g>
