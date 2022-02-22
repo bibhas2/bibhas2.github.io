@@ -25,17 +25,18 @@
       font-size: 106pt;
       font-weight: bold;
     }
-    .fadein {
-      animation: fadeIn linear 1s;
+    .even-fadeout {
+      animation: fadeOutEven ease-in 6s;
     }
-    .fadeout {
-      animation: fadeOut linear 1s;
+    .odd-fadeout {
+      animation: fadeOutOdd ease-in 6s;
     }
-    @keyframes fadeIn {
-      0% {opacity:0;}
-      100% {opacity:1;}
-    }
-    @keyframes fadeOut {
+
+    @keyframes fadeOutEven {
+      0% {opacity:1;}
+      100% {opacity:0;}
+    }    
+    @keyframes fadeOutOdd {
       0% {opacity:1;}
       100% {opacity:0;}
     }    
@@ -47,12 +48,15 @@
     <div id="my-interactive"></div>
     <div class="app">
       <div class="number">
-        <div v-if="currentIndex !== undefined" :class="{fadein: isFadein, fadeout: isFadeout}">
+        <div v-if="currentIndex !== undefined && currentIndex % 2 == 0" class="even-fadeout">
+          {{numbers[currentIndex]}}
+        </div>  
+        <div v-if="currentIndex !== undefined && currentIndex % 2 != 0" class="odd-fadeout">
           {{numbers[currentIndex]}}
         </div>  
       </div>
       <button @click="startGame(3)">Add 3 Numbers</button>
-      <button @click="startGame(7)">Add 7 Numbers</button>
+      <button @click="startGame(6)">Add 6 Numbers</button>
     </div>
 
   </div>
@@ -61,8 +65,6 @@
 var app = new Vue({
     el: '.app',
     data: {
-      isFadein: false,
-      isFadeout: false,
       numbers: [],
       currentIndex: undefined,
       interval: undefined,
