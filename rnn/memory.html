@@ -54,9 +54,17 @@
         <div v-if="currentIndex !== undefined && currentIndex % 2 != 0" class="odd-fadeout">
           {{numbers[currentIndex]}}
         </div>  
+        <div v-if="answer">
+          {{answer}}
+        </div>
       </div>
-      <button @click="startGame(3)">Add 3 Numbers</button>
-      <button @click="startGame(6)">Add 6 Numbers</button>
+      <p>
+        <button @click="startGame(3)">Add 3 Numbers</button>
+        <button @click="startGame(6)">Add 6 Numbers</button>  
+      </p>
+      <p>
+        <button @click="showAnswer()">Show Answer</button>
+      </p>
     </div>
 
   </div>
@@ -68,6 +76,7 @@ var app = new Vue({
       numbers: [],
       currentIndex: undefined,
       interval: undefined,
+      answer: undefined,
     },
     methods: {
       startGame(n) {
@@ -78,7 +87,8 @@ var app = new Vue({
         }
 
         this.currentIndex = 0
-
+        this.answer = undefined
+        
         this.stopTimer()
 
         this.interval = setInterval(() => {
@@ -99,6 +109,10 @@ var app = new Vue({
 
           this.interval = undefined
         }
+      },
+      showAnswer() {
+        this.currentIndex = undefined
+        this.answer = this.numbers.reduce((total, n) => total + n, 0)
       }
     },
     computed: {
