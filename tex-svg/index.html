@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tex to SVG Export</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>  
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  input[type="text"] {
+    font-size: 1.2em;
+    display: block;
+    width: 400px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .preview_area {
+    width: 400px;
+    height: 200px;
+    border: thin solid black;
+    padding: 8px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+  }
+  button {
+    font-size: 1.2em;
+  }
+</style>
+</head>
+
+<body>
+  <h1>Tex to SVG Export</h1>
+  <div class="app-container">
+    <input type="text" v-model="tex"/><button @click="preview()">Preview</button>
+    <div ref="previewArea" class="preview_area">
+
+    </div>
+    <button @click="save()">Save SVG</button>
+  </div>
+
+<script>
+ var app = new Vue({
+      el: '.app-container',
+      data: {
+        tex: "\\frac{x}{x+1}",
+      },
+      methods: {
+        preview() {
+          let svg = MathJax.tex2svg(this.tex).childNodes[0]//.outerHTML
+          this.$refs.previewArea.replaceChildren()
+          this.$refs.previewArea.appendChild(svg)
+        },
+        async save() {
+          if (this.$refs.previewArea.childNodes.length == 0) {
+            return
+          }
+
+          let svg = this.$refs.previewArea.childNodes[0].outerHTML
+
+          try {
+            const handle = await window.showSaveFilePicker()
+
+            if (!handle || !await this.verifyPermissions(handle)) {
+              return;
+            }
+
+            const stream = await handle.createWritable()
+
+            await stream.write(svg)
+            await stream.close()
+          } catch (error) {
+            console.log(error)
+          }
+        },
+        async verifyPermissions(handle) {
+          if (await handle.queryPermission({ mode: 'readwrite' }) === 'granted') {
+            return true;
+          }
+
+          if (await handle.requestPermission({ mode: 'readwrite' }) === 'granted') {
+            return true;
+          }
+
+          return false;
+        },
+      },
+      computed: {
+        
+      }
+  })
+</script>
+
+</body>
+
+</html>
