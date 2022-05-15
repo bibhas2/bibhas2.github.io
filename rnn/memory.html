@@ -10,6 +10,7 @@
   <style>
     button {
       padding: 8px;
+      width: 140px;
     }
     .number {
       border: 4px solid black;
@@ -59,10 +60,11 @@
         </div>
       </div>
       <p>
-        <button @click="startGame(3)">Add 3 Numbers</button>
-        <button @click="startGame(6)">Add 6 Numbers</button>  
+        You will be shown six numbers, one at a time. Calculate the sum of these numbers.
       </p>
       <p>
+        <button @click="startGame(6)">Start Game</button>  
+
         <button @click="showAnswer()">Show Answer</button>
       </p>
     </div>
