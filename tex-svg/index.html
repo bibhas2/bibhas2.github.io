@@ -50,16 +50,35 @@
       },
       methods: {
         preview() {
-          let svg = MathJax.tex2svg(this.tex).childNodes[0]//.outerHTML
+          let svg = MathJax.tex2svg(this.tex).childNodes[0]
+
+          this.convertUnit(svg)
+
           this.$refs.previewArea.replaceChildren()
           this.$refs.previewArea.appendChild(svg)
+        },
+        convertUnit(svg) {
+          //Convert ex unit to px.
+          let width = svg.getAttribute("width")
+          let height = svg.getAttribute("height")
+
+          if (width !== null) {
+            const w = parseFloat(width) * 10.0
+
+            svg.setAttribute("width", w + "px")
+          }
+          if (height !== null) {
+            const h = parseFloat(height) * 10.0
+
+            svg.setAttribute("height", h + "px")
+          }
         },
         async save() {
           if (this.$refs.previewArea.childNodes.length == 0) {
             return
           }
 
-          let svg = this.$refs.previewArea.childNodes[0].outerHTML
+          let svg = this.$refs.previewArea.childNodes[0]
 
           try {
             const handle = await window.showSaveFilePicker()
@@ -70,7 +89,7 @@
 
             const stream = await handle.createWritable()
 
-            await stream.write(svg)
+            await stream.write(svg.outerHTML)
             await stream.close()
           } catch (error) {
             console.log(error)
