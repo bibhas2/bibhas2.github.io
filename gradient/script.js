@@ -65,7 +65,7 @@ Vue.component('gd-tool', {
       <div class="data-cell">{{fmt(error(sample[0], sample[1]))}}</div>
     </template>
     <div class="rmse-label">
-      Root Mean Square Error (RMSE)
+      Mean Square Error (MSE)
     </div>
     <div class="rmse-value">{{rmseFormatted}}</div>
     </div>
