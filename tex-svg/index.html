@@ -40,6 +40,7 @@
 
     </div>
     <button @click="save()">Save SVG</button>
+    <button @click="copy()">Copy SVG</button>
   </div>
 
 <script>
@@ -72,6 +73,15 @@
 
             svg.setAttribute("height", h + "px")
           }
+        },
+        async copy() {
+          if (this.$refs.previewArea.childNodes.length == 0) {
+            return
+          }
+
+          let svg = this.$refs.previewArea.childNodes[0]
+
+          await navigator.clipboard.writeText(svg.outerHTML)
         },
         async save() {
           if (this.$refs.previewArea.childNodes.length == 0) {
