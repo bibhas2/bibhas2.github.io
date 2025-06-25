@@ -1,118 +1,485 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gradient Descent</title>
-  <link rel="stylesheet" href="https://vectorjs.org/library.css">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  
-  <link rel="stylesheet" href="style.css">
-  
+    <meta charset="UTF-8">
+    <title>Basic HTML Page</title>
+    <style>
+        body {
+            font-size: 14pt;
+            font-family: Arial, Helvetica, sans-serif;
+            margin:20px;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: auto auto 1fr;
+            gap: 20px;
+        }
+
+        .table {
+            display: grid;
+            grid-template-columns: auto auto auto auto;
+            border: 1px solid black;
+            font-size: 16pt;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .table div {
+            padding: 10px;
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        .table-header {
+            background-color: black;
+            color: white;
+        }
+
+        .training-area {
+            display: grid;
+            grid-template-columns: auto auto;
+            padding-top: 20px;
+            font-size: 16pt;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .training-area button {
+            padding: 10px;
+            font-size: 14pt;
+            font-family: Arial, Helvetica, sans-serif;
+            cursor: pointer;
+        }
+
+        #mse {
+            text-align: right;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="app-container">
-    <div id="my-interactive"></div>
-    <div class="app">
-      <gd-tool></gd-tool>
+    <h1>Gradient Descent Demo</h1>
+    <p>
+        <h4>Prediction Function</h4>
+
+        <math>
+            <mrow>
+                <mover>
+                    <mi>y</mi>
+                    <mo stretchy="false">ˆ</mo>
+                </mover>
+                <mo>=</mo>
+                <mi>W</mi>
+                <mi>x</mi>
+                <mo>+</mo>
+                <mi>b</mi>
+            </mrow>
+        </math>
+        <h4>Mean Square Error (MSE)</h4>
+        <math><mrow><mi>J</mi><mo>=</mo></mrow><mrow><mfrac><mn>1</mn><mi>m</mi></mfrac><mo movablelimits="false">∑</mo><mo form="prefix" stretchy="false">(</mo><mi>y</mi><mo>−</mo><mover><mi>y</mi><mo stretchy="false" class="chr-sml wbk-sml-acc" style="math-depth:0;">ˆ</mo></mover><msup><mo form="postfix" stretchy="false">)</mo><mn>2</mn></msup></mrow></math>
+    
+        <h4>Gradient Descent</h4>
+
+        <math><mrow><mi>W</mi><mo>=</mo></mrow><mrow><mi>W</mi><mo>−</mo></mrow><mrow><mi>α</mi><mfrac><mrow><mi>∂</mi><mi>J</mi></mrow><mrow><mi>∂</mi><mi>W</mi></mrow></mfrac></mrow></math>
+        <br /><br />
+        <math><mrow><mi>b</mi><mo>=</mo></mrow><mrow><mi>b</mi><mo>−</mo></mrow><mrow><mi>α</mi><mfrac><mrow><mi>∂</mi><mi>J</mi></mrow><mrow><mi>∂</mi><mi>b</mi></mrow></mfrac></mrow></math>
+    
+    </p>
+    <div class="main">
+
+        <canvas width="800" height="600" id="canvas">
+        </canvas>
+
+        <div>
+            <div class="table">
+                <div class="table-header">Temperature<br />
+                    <math>
+                        <mi>x</mi>
+                    </math>      
+                </div>
+                <div class="table-header">Actual<br />Foot Traffic<br />
+                    <math>
+                        <mi>y</mi>
+                    </math>                
+                </div>
+                <div class="table-header">Predicted<br />Foot Traffic<br />
+                    <math>
+                        <mover>
+                            <mi>y</mi>
+                            <mo stretchy="false">ˆ</mo>
+                        </mover>
+                    </math>
+                </div>
+                <div class="table-header">Error<br />
+                    <math>
+                        <mrow>
+                            <mo form="prefix" stretchy="false">(</mo>
+                            <mi>y</mi>
+                            <mo>−</mo>
+                            <mover>
+                                <mi>y</mi>
+                                <mo stretchy="false">ˆ</mo>
+                            </mover>
+                            <mo form="postfix" stretchy="false">)</mo>
+                        </mrow>
+                    </math>
+                </div>
+            </div>
+            <div class="training-area">
+                <button id="train-button">Training Step</button>
+                <div id="mse">MSE: 0.0</div>
+            </div>
+        </div>
+        <div></div>
     </div>
-
-  </div>
-
-  <div class="definitions">
-    <h2>DEFINITIONS</h2>
-    <h3>Features</h3>
-    <p>
-      Features are the independent variables in a model. Here the observed temperature is a feature. Foot traffic
-      depends on it. We use the symbol <b>x</b> for features.
-    </p>
-    <h3>Label</h3>
-    <p>
-      A label is the observed effect. Here the actual foot traffic is the label. We
-      will use the symbol <b>y</b> to represent a label.
-    </p>
-    <h3>Weight</h3>
-    <p>Weight is the slope of the line we fit through the observed data samples. It measures how much
-      effect a feature has on the label. We use the symbol
-      <b>W</b> for it.
-    </p>
-    <h3>Bias</h3>
-    <p>Bias is the y intercept of the line we fit through the data sample. We use the symbol
-      <b>b</b> for it.</p>
-    <h3>Prediction</h3>
-    <p>This is the value of a label predicted by the line we fit through the data samples.
-      We use the symbol <b>y'</b> or <b>y_</b> for it. Prediction is computed using the equation.
-      $$
-      y' = W \times x + b
-      $$
-    </p>
-    <p style="text-align: center;">
-      <img src="one-feature.svg" height="170px"/>
-    </p>
-    <p>
-      The goal of a model is to find the most optimal values of <b>W</b> and <b>b</b> that will give us the
-      highest quality predictions. Sadly we can not use algebra to solve for <b>W</b> and <b>b</b> using a single equation.
-    </p>
-    <h3>Error or Cost</h3>
-    <p>
-      Error measures the accuracy of our predictions or how good a job we have done fitting the line through the observed data samples. We use the
-      symbol <b>J</b> for it. Mean
-      Square Error (MSE) is a very effective and common way to measure the overall error of a model.
-      It is calculated using this equation. Here <b>m</b> is the number of data samples.
-
-      $$
-      J = \frac{1}{2m} \sum (y - y')^{2}
-      $$
-
-      By replacing the value of <b>y'</b> we get.
-
-      $$
-      J = \frac{1}{2m} \sum (y - (W \times x + b))^{2}
-      $$
-
-      Here <b>x</b> and <b>y</b> are the observed data points. This makes <b>J</b> solely a function of
-      <b>W</b> and <b>b</b>. This equation is still not enough to solve for <b>W</b> and <b>b</b>.
-    </p>
-    <h3>Optimization</h3>
-    <p>
-      Various algorithms exist in Machine Learning (ML) that can approximately solve for <b>W</b> and <b>b</b>. 
-      They do this by repeatedly trying out different values of <b>W</b> and <b>b</b> until we achieve an acceptable error value.
-      This is called optimization or error minimization.
-    </p>
-    <p>
-      A brute force optimizer can try out random values of <b>W</b> and <b>b</b> or try all
-      possible combinations of them. But that will take immense computational power to solve even
-      the simplest of cases. This is why reserchers have developed optimizers that make educated
-      guesses and very quickly arrive at optimal values of <b>W</b> and <b>b</b>. Commonly used
-      optimizers are:
-
-      <ul>
-        <li>Gradient Descent</li>
-        <li>Adam</li>
-        <li>Adagrad</li>
-        <li>RMS Prop</li>
-      </ul>
-    </p>
-    <p>
-      We can now look at <a target="_blank" href="training.html">Gradient Descent</a> in more details.
-    </p>
-  </div>
-
-  <!-- We need to use type="module" and import because
-  in script.js we import: import Interactive. Otherwise scripts are
-  getting loaded out of order.-->
-  <script type="module">
-  import './script.js'
-
-  var app = new Vue({
-      el: '.app',
-  })
-  </script>
-
 </body>
+<script>
+
+    class GDBoard {
+        static POINT_RADIUS = 6
+
+        XMAX = 100
+        YMAX = 18
+        predictedCells = []
+        errorCells = []
+        mseDisplay = document.getElementById('mse')
+        mse = 0.0
+        W = 0.0
+        b = 0.0
+        learningRate = 0.0005
+
+        constructor(bounds) {
+            this.canvas = document.getElementById('canvas')
+            this.ctx = this.canvas.getContext('2d')
+            this.bounds = this.canvas.getBoundingClientRect()
+            this.sourceData = [
+                [30, 6.5],
+                [40, 9],
+                [45, 9],
+                [50, 9.6],
+                [60, 10],
+                [65, 11.5],
+                [70, 12.],
+                [75, 12.5],
+                [80, 14.75]
+            ]
+
+            this.canvas.addEventListener('mousedown', this.mouseDown.bind(this));
+            this.canvas.addEventListener('mousemove', this.mouseMove.bind(this));
+            this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
+            document.getElementById('train-button').addEventListener('click', () => {
+                this.trainingStep();
+            })
+
+            this.margin = 40
+
+            this.xscale = (this.canvas.width - 2 * this.margin) / this.XMAX
+            this.yscale = (this.canvas.height - 2 * this.margin) / this.YMAX
+
+            this.resetLine()
+
+            this.markerSize = 20
+
+            this.dragLineStart = false
+            this.dragLineEnd = false
+
+            this.sourceDataToCanvas = this.sourceData.map(sample => {
+                return this.toCanvas(sample[0], sample[1])
+            })
+
+            this.selectedSample = -1
+
+            this.createCells()
+            this.updatePredictions()
+
+            this.drawItems()
+        }
+
+        predict(temp) {
+            return this.W * temp + this.b
+        }
+
+        error(temp, actual) {
+            return this.predict(temp) - actual
+        }
+
+        updatePredictions() {
+            let sum = 0.0
+
+            this.sourceData.forEach((pair, index) => {
+                const predicted = this.predict(pair[0])
+                const err = pair[1] - predicted
+
+                sum += (err * err)
+
+                this.predictedCells[index].textContent = predicted.toFixed(2);
+                this.errorCells[index].textContent = err.toFixed(2);
+            })
+
+            this.mse = sum / (this.sourceData.length)
+            this.mseDisplay.textContent = `MSE: ${this.mse.toFixed(2)}`;
+        }
+
+        createCells() {
+            const tableDiv = document.querySelector('.table');
+
+            this.sourceData.forEach(sample => {
+                let cell = document.createElement('div');
+                cell.textContent = sample[0].toFixed(2);
+                tableDiv.appendChild(cell);
+
+                cell = document.createElement('div');
+                cell.textContent = sample[1].toFixed(2);
+                tableDiv.appendChild(cell);
+
+                cell = document.createElement('div');
+                tableDiv.appendChild(cell);
+                this.predictedCells.push(cell);
+
+                cell = document.createElement('div');
+                tableDiv.appendChild(cell);
+                this.errorCells.push(cell);
+            });
+        }
+        resetLine() {
+            this.lineStart = { x: 0, y: Math.random() * this.YMAX }
+            this.lineEnd = { x: (this.XMAX - 5), y: Math.random() * this.YMAX }
+
+            this.b = this.calculateB()
+            this.W = this.calculateW()
+        }
+
+        toCanvas(x, y) {
+            return [
+                this.margin + x * this.xscale,
+                this.canvas.height - this.margin - y * this.yscale
+            ]
+        }
+
+        eventToData(e) {
+            const canvasRect = this.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - canvasRect.left;
+            const mouseY = e.clientY - canvasRect.top;
+
+            return [
+                (mouseX - this.margin) / this.xscale,
+                (this.canvas.height - this.margin - mouseY) / this.yscale
+            ]
+        }
+
+        text(txt, x, y, vertical = false, size = 20, color = "black", align = "center") {
+            if (vertical) {
+                this.ctx.save();
+                this.ctx.translate(x, y);
+                this.ctx.rotate(-Math.PI / 2);
+                x = 0;
+                y = 0;
+            }
+
+            this.ctx.font = `${size}px Arial`;
+            this.ctx.fillStyle = color;
+            this.ctx.textAlign = align;
+            this.ctx.fillText(txt, x, y);
+
+            if (vertical) {
+                this.ctx.restore();
+            }
+        }
+
+        toolTip(txt, x, y, fontSize = 16) {
+            this.ctx.font = `${fontSize}px Arial`;
+            const textMetrics = this.ctx.measureText(txt);
+
+            const textWidth = textMetrics.width + 20;
+            const textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent + 10;
+
+            this.ctx.beginPath()
+            this.ctx.roundRect(x - textWidth / 2, y - textHeight / 2, textWidth, textHeight, 4)
+            this.ctx.fillStyle = "black"
+            this.ctx.fill()
+
+            this.text(txt, x, y + 5, false, fontSize, "white", "center")
+        }
+
+        dataPoint(x, y) {
+            this.circle(x, y, GDBoard.POINT_RADIUS, "#cfcfcf")
+        }
+
+        line(x1, y1, x2, y2, lineColor = "black", lineWidth = 1) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.strokeStyle = lineColor;
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.stroke();
+        }
+
+        rect(x, y, width, height, fillColor = "transparent", lineColor = "black", lineWidth = 1) {
+            this.ctx.beginPath();
+            this.ctx.rect(x, y, width, height);
+            this.ctx.fillStyle = fillColor;
+            this.ctx.fill();
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.strokeStyle = lineColor;
+            this.ctx.stroke();
+        }
+
+        marker(x, y) {
+            this.rect(x - this.markerSize / 2, y - this.markerSize / 2, this.markerSize, this.markerSize, "white", "black", 1);
+        }
+
+        circle(x, y, r, fillColor = "transparent", lineColor = "black", lineWidth = 1) {
+            this.ctx.beginPath();
+
+            this.ctx.arc(x, y, r, 0, Math.PI * 2);
+            this.ctx.fillStyle = fillColor; // No fill color
+            this.ctx.fill();
+            this.ctx.lineWidth = lineWidth;
+            this.ctx.strokeStyle = lineColor;
+            this.ctx.stroke();
+        }
+
+        weightLine() {
+            const [x1, y1] = this.toCanvas(this.lineStart.x, this.lineStart.y);
+            const [x2, y2] = this.toCanvas(this.lineEnd.x, this.lineEnd.y);
+
+            this.line(x1, y1, x2, y2, "black", 2);
+            this.marker(x1, y1)
+            this.marker(x2, y2)
+
+            // Format this.lineStart.y to 2 decimal places and display it near the start marker
+            this.text(`b = ${this.b.toFixed(2)}`,
+                x1 + 25, y1 + 25, false, 16, "blue", "left");
+
+            this.text(`W = ${this.W.toFixed(2)}`,
+                x2 - 15, y2 - 15, false, 16, "blue", "right");
+        }
+
+        hitTest(e, point, boxSize) {
+            const [x, y] = point;
+            const rectLeft = x - boxSize / 2;
+            const rectTop = y - boxSize / 2;
+            const rectRight = x + boxSize / 2;
+            const rectBottom = y + boxSize / 2;
+
+            const canvasRect = this.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - canvasRect.left;
+            const mouseY = e.clientY - canvasRect.top;
+
+            return mouseX >= rectLeft && mouseX <= rectRight && mouseY >= rectTop && mouseY <= rectBottom;
+        }
+
+        drawItems() {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            //Axis
+            this.rect(this.margin, this.margin, this.canvas.width - 2 * this.margin, this.canvas.height - 2 * this.margin)
+
+            this.sourceDataToCanvas.forEach(([x, y]) => {
+                this.dataPoint(x, y)
+            })
+
+            this.weightLine()
+
+            if (this.selectedSample >= 0) {
+                const label = `X = ${this.sourceData[this.selectedSample][0]}, y = ${this.sourceData[this.selectedSample][1]}`
+
+                const [x, y] = this.toCanvas(this.sourceData[this.selectedSample][0], this.sourceData[this.selectedSample][1])
+
+                this.toolTip(label, x, y - 24)
+            }
+
+            // Draw text at the bottom
+            this.text('y (Foot Traffic)', this.margin - 14, this.canvas.height / 2, true);
+            this.text('x (Temperature)', this.canvas.width / 2, this.canvas.height - 10);
+        }
+
+        mouseDown(e) {
+            if (e.buttons !== 1) return;
+
+            this.dragLineStart = this.dragLineEnd = false
+            this.selectedSample = -1
+
+            if (this.hitTest(e, this.toCanvas(this.lineStart.x, this.lineStart.y), this.markerSize)) {
+                this.dragLineStart = true
+            } else if (this.hitTest(e, this.toCanvas(this.lineEnd.x, this.lineEnd.y), this.markerSize)) {
+                this.dragLineEnd = true
+            } else {
+                this.selectedSample = this.sourceDataToCanvas.findIndex(sample => this.hitTest(e, sample, GDBoard.POINT_RADIUS + 6))
+                this.drawItems()
+            }
+        }
+
+        calculateB() {
+            return this.lineStart.y;
+        }
+
+        calculateW() {
+            return (this.lineEnd.y - this.lineStart.y) / (this.lineEnd.x - this.lineStart.x);
+        }
+
+        trainingStep() {
+            for (let i = 0; i < 5000; ++i) {
+                let [dJ_dW, dJ_db] = this.sourceData
+                    .map(pair => {
+                        const base = (this.predict(pair[0]) - pair[1])
+
+                        return [base * pair[0], base]
+                    })
+                    .reduce((acc, current) => [acc[0] + current[0], acc[1] + current[1]], [0, 0])
+
+                dJ_dW = dJ_dW / this.sourceData.length
+                dJ_db = dJ_db / this.sourceData.length
+
+                this.W = this.W - this.learningRate * dJ_dW
+                this.b = this.b - this.learningRate * dJ_db
+            }
+
+            this.lineStart.y = this.b
+            this.lineEnd.y = this.lineStart.y + this.W * (this.lineEnd.x - this.lineStart.x)
+
+            this.updatePredictions()
+            this.drawItems()
+        }
+
+        mouseMove(e) {
+            if (e.buttons !== 1) return;
+
+            if (this.dragLineStart) {
+                const [x, y] = this.eventToData(e)
+
+                if (y < 0) {
+                    y = 0;
+                }
+                if (y > this.YMAX) {
+                    y = this.YMAX;
+                }
+
+                this.lineStart.y = y
+                this.b = this.calculateB()
+                this.W = this.calculateW()
+            } else if (this.dragLineEnd) {
+                const [x, y] = this.eventToData(e)
+
+                if (y < 0) {
+                    y = 0;
+                }
+                if (y > this.YMAX) {
+                    y = this.YMAX;
+                }
+
+                this.lineEnd.y = y
+                this.b = this.calculateB()
+                this.W = this.calculateW()
+            }
+
+            this.updatePredictions()
+            this.drawItems();
+        }
+    }
+
+    const board = new GDBoard()
+
+</script>
 
 </html>
